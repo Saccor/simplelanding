@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Arfve Landing Page
+
+A modern landing page for Arfve, a company building sustainable audio devices.
+
+## Overview
+
+This project is a responsive landing page for Arfve headphones, built with Next.js and styled with Tailwind CSS. The site features a clean, modern design that showcases the brand's focus on sustainability and cutting-edge technology.
+
+## Features
+
+- Modern, responsive design
+- Interactive sound toggle for hero video
+- Email signup form with validation
+- Clean, minimalist UI
+
+## Technology Stack
+
+- Next.js 15+
+- React 19+
+- TypeScript
+- Tailwind CSS
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation & Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+Arfve-Landing/
+├── src/
+│ ├── app/
+│ │ ├── globals.css       # Global styles and Tailwind imports
+│ │ ├── layout.tsx        # Root layout with metadata and fonts
+│ │ └── page.tsx          # Main landing page
+│ ├── components/
+│ │ ├── Header.tsx        # Site header with sound toggle
+│ │ ├── Hero.tsx          # Hero section with video background
+│ │ ├── ProductInfo.tsx   # Product information section
+│ │ ├── NewsletterSignup.tsx # Email signup component
+│ │ └── Footer.tsx        # Site footer with links
+├── public/               # Static assets
+│ ├── images/             # Image assets
+│ └── HeroVideo 1.mp4     # Hero section background video (not in Git)
+├── package.json          # Dependencies and scripts
+└── next.config.ts        # Next.js configuration
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Media Assets
 
-## Learn More
+The landing page requires the following media assets:
 
-To learn more about Next.js, take a look at the following resources:
+1. Hero video (HeroVideo 1.mp4) - Background video for the hero section
+2. Person with earbuds image - For the product section
+3. Logo and favicon
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Large Media Files
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Note that the Hero video file (`public/HeroVideo 1.mp4`) is excluded from Git due to its size. When cloning this repository, you'll need to get this file separately and place it in the `public` directory.
 
-## Deploy on Vercel
+## ToDo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Add actual product images
+- Connect newsletter signup to backend API
+- Add animations for scroll effects
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
