@@ -107,8 +107,8 @@ export default function SimpleLanding({
       />
       
       {/* Hero Section */}
-      <section className="w-full bg-black">
-        <div className="relative" style={{ height: '100vh', minHeight: '520px' }}>
+      <section className="w-full bg-black flex justify-center">
+        <div className="video-container">
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover object-center"
@@ -140,7 +140,7 @@ export default function SimpleLanding({
           )}
 
           {/* Overlay for better visibility */}
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 bg-black/30 z-[1]"></div>
         </div>
       </section>
 
