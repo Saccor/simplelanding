@@ -40,31 +40,24 @@ export default function SimpleLanding({
   // Hero Section State
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
-  const [imageLoading, setImageLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("SimpleLanding props:", {
+      emailHeading,
+      emailSubtext,
+      emailImage
+    });
+  }, [emailHeading, emailSubtext, emailImage]);
 
   // Hero Section Effects
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    console.log('Attempting to load video from URL:', videoUrl);
-    
-    // Add a fetch request to check if the video file is accessible
-    fetch(videoUrl)
-      .then(response => {
-        if (response.ok) {
-          console.log('Video file exists and is accessible', response.status);
-        } else {
-          console.error('Video file fetch failed:', response.status, response.statusText);
-        }
-      })
-      .catch(error => {
-        console.error('Error checking video file:', error);
-      });
-
     const handleLoadedData = () => {
-      console.log('Video loaded successfully');
+      console.log('Video loaded successfully!');
       setIsVideoLoading(false);
       video.play().catch(error => {
         console.error('Video autoplay failed:', error);
@@ -73,28 +66,19 @@ export default function SimpleLanding({
     };
 
     const handleError = (event: Event) => {
-      console.error('Video loading error:', event);
+      console.error('Video error:', event);
       setIsVideoLoading(false);
     };
 
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('error', handleError as EventListener);
-    
-    // Add additional event listeners for better debugging
-    video.addEventListener('loadstart', () => console.log('Video load started'));
-    video.addEventListener('progress', () => console.log('Video download in progress'));
-    video.addEventListener('canplay', () => console.log('Video can start playing'));
-    
     video.load();
 
     return () => {
       video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('error', handleError as EventListener);
-      video.removeEventListener('loadstart', () => console.log('Video load started'));
-      video.removeEventListener('progress', () => console.log('Video download in progress'));
-      video.removeEventListener('canplay', () => console.log('Video can start playing'));
     };
-  }, [videoUrl]);
+  }, []);
 
   // Update video muted state when initialMuted prop changes
   useEffect(() => {
@@ -116,24 +100,23 @@ export default function SimpleLanding({
   };
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main>
       <Header 
         isMuted={isMuted} 
         onToggleMute={handleToggleMute} 
       />
       
       {/* Hero Section */}
-      <section className="w-full h-screen bg-black relative pt-16">
-        <div className="absolute inset-0 w-full h-full">
+      <section className="w-full bg-black">
+        <div className="relative" style={{ height: 'calc(100vh - 80px)', minHeight: '520px' }}>
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center"
             playsInline
             muted={isMuted}
             loop
             autoPlay
             preload="auto"
-            controls={false}
           >
             <source 
               src={videoUrl} 
@@ -158,40 +141,50 @@ export default function SimpleLanding({
 
           {/* Overlay for better visibility */}
           <div className="absolute inset-0 bg-black/30"></div>
-
+          
           {/* Video Controls */}
           <button
             onClick={handleToggleMute}
-            className="absolute bottom-6 right-6 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-20"
-            aria-label={isMuted ? "Unmute" : "Mute"}
+            className="absolute bottom-6 right-6 p-3 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
           >
-            {isMuted ? (
-              <Image
-                src="/volume-off.svg"
-                alt="Unmute"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-            ) : (
-              <Image
-                src="/volume-on.svg"
-                alt="Mute"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-            )}
+            <Image
+              src={isMuted ? "/volume-off.svg" : "/volume-on.svg"}
+              alt={isMuted ? "Unmute" : "Mute"}
+              width={24}
+              height={24}
+              className="w-6 h-6 text-white"
+            />
           </button>
         </div>
       </section>
-      
-      <TextSection 
-        mainHeading={mainHeading}
-        subHeading={subHeading}
-      />
-      
-      <EmailSection 
+
+      {/* Text Section */}
+      <section className="w-full bg-white">
+        <div className="w-full py-12 md:py-24">
+          <div className="w-[92%] lg:w-[80%] xl:w-[618px] mx-auto px-4 md:px-0">
+            <h2 className="font-normal 
+                       text-[20px] xs:text-[24px] sm:text-[28px] md:text-[40px] lg:text-[50px]
+                       leading-[1.3]
+                       text-center uppercase tracking-[-0.02em] text-[#192124]
+                       transition-all duration-300">
+              {mainHeading}
+            </h2>
+            {subHeading && (
+              <p className="font-normal 
+                        text-[16px] xs:text-[20px] sm:text-[24px] md:text-[32px] lg:text-[40px]
+                        leading-[1.3]
+                        text-center uppercase tracking-[-0.02em] text-[#192124]
+                        transition-all duration-300
+                        mt-4 md:mt-6">
+                {subHeading}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Use the standalone EmailSection component */}
+      <EmailSection
         emailHeading={emailHeading}
         emailSubtext={emailSubtext}
         emailImage={emailImage}

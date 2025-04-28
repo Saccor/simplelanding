@@ -41,69 +41,123 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   };
 
   return (
-    <section className="w-full bg-white py-10 md:py-16">
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-          {/* Image */}
-          <div className="md:col-span-1">
-            <div className="relative h-[320px] md:h-[400px] rounded-lg overflow-hidden">
-              <Image
-                src={emailImage}
-                alt="Arfve earbuds"
-                fill
-                className={`
-                  object-cover
-                  transition-all duration-700 ease-in-out
-                  ${imageLoading ? 'scale-110 blur-sm' : 'scale-100 blur-0'}
-                `}
-                onLoad={() => setImageLoading(false)}
-                priority
-              />
-            </div>
-          </div>
-          
-          {/* Content */}
-          <div className="md:col-span-1 text-left flex flex-col justify-center">
-            <h4 className="text-xl font-medium mb-3">{emailHeading}</h4>
-            <p className="text-gray-700 mb-8">{emailSubtext}</p>
+    <div style={{ 
+      width: '100%', 
+      height: '650px', 
+      background: '#F3F3F3'
+    }}>
+      <div style={{ 
+        maxWidth: '1440px', 
+        height: '100%', 
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'row'
+      }}>
+        {/* Left side - Image */}
+        <div style={{ 
+          width: '50%', 
+          height: '100%', 
+          position: 'relative'
+        }}>
+          <Image
+            src={emailImage}
+            alt="Arfve earbuds"
+            fill
+            style={{
+              objectFit: 'cover',
+              opacity: imageLoading ? 0 : 1,
+              transition: 'opacity 0.5s ease'
+            }}
+            onLoad={() => setImageLoading(false)}
+            priority
+          />
+        </div>
+        
+        {/* Right side - Content */}
+        <div style={{ 
+          width: '50%', 
+          height: '100%', 
+          background: 'white',
+          padding: '64px 48px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+          <div style={{ maxWidth: '400px' }}>
+            <h2 style={{ 
+              fontSize: '28px',
+              fontWeight: '600',
+              color: '#333333',
+              marginBottom: '16px',
+              lineHeight: '1.3'
+            }}>
+              {emailHeading}
+            </h2>
             
-            <div>
-              <p className="text-sm text-gray-600 mb-2">
-                Sign up with your email address, pay €1 to get our best opening offer
-              </p>
-              
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row">
-                <div className="flex-grow">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-                    disabled={isSubmitting}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="signup-button px-6 py-2 rounded-r-md sm:mt-0 mt-2 sm:rounded-l-none rounded-l-md"
-                  disabled={isSubmitting || !email}
-                >
-                  {isSubmitting ? 'Signing up...' : 'Sign up'}
-                </button>
-              </form>
-              
-              {formState === 'success' && (
-                <p className="mt-2 text-green-600">Thank you for signing up!</p>
-              )}
-              {formState === 'error' && (
-                <p className="mt-2 text-red-600">Something went wrong. Please try again.</p>
-              )}
+            <p style={{ 
+              fontSize: '22px',
+              fontWeight: '600',
+              color: '#333333',
+              marginBottom: '32px',
+              lineHeight: '1.3'
+            }}>
+              {emailSubtext}
+            </p>
+            
+            <p style={{ 
+              fontSize: '16px',
+              color: '#333333',
+              marginBottom: '24px'
+            }}>
+              Sign up with your email address, pay €1 to get our best opening offer
+            </p>
+            
+            <div style={{ display: 'flex' }}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email"
+                style={{ 
+                  flex: '1',
+                  padding: '12px 16px',
+                  borderRadius: '9999px',
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  border: '1px solid #D1D5DB',
+                  fontSize: '16px',
+                  outline: 'none'
+                }}
+              />
+              <button
+                onClick={handleSubmit}
+                style={{ 
+                  backgroundColor: '#B75C31',
+                  color: 'white',
+                  padding: '12px 24px',
+                  borderRadius: '9999px',
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  border: 'none',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                Sign-up
+              </button>
             </div>
+            
+            {formState === 'success' && (
+              <p style={{ marginTop: '8px', color: '#059669' }}>Thank you for signing up!</p>
+            )}
+            {formState === 'error' && (
+              <p style={{ marginTop: '8px', color: '#DC2626' }}>Something went wrong. Please try again.</p>
+            )}
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
