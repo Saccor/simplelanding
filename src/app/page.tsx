@@ -12,6 +12,7 @@ export default function Home() {
 
   return (
     <SimpleLanding 
+      videoUrl="/HeroVideo1.mp4"
       mainHeading="WE'RE BUILDING TECHNOLOGY"
       subHeading="THAT'S MORE THAN SMART"
       emailHeading="We're shaping a sustainable future for audio devices."
