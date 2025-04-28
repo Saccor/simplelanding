@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
+import useScrollObserver from '../hooks/useScrollObserver';
 
 interface EmailSectionProps {
   emailHeading: string;
@@ -18,6 +19,18 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
+  
+  // Refs for scroll animations
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const subtextRef = useRef<HTMLParagraphElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  
+  // Use scroll observers
+  useScrollObserver({ ref: headingRef });
+  useScrollObserver({ ref: subtextRef, threshold: 0.2 });
+  useScrollObserver({ ref: descriptionRef, threshold: 0.2 });
+  useScrollObserver({ ref: formRef, threshold: 0.3 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,35 +97,51 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           justifyContent: 'center'
         }}>
           <div style={{ maxWidth: '400px' }}>
-            <h2 style={{ 
-              fontSize: '28px',
-              fontWeight: '600',
-              color: '#333333',
-              marginBottom: '16px',
-              lineHeight: '1.3'
-            }}>
+            <h2 
+              ref={headingRef}
+              className="scroll-reveal"
+              style={{ 
+                fontSize: '28px',
+                fontWeight: '600',
+                color: '#333333',
+                marginBottom: '16px',
+                lineHeight: '1.3'
+              }}
+            >
               {emailHeading}
             </h2>
             
-            <p style={{ 
-              fontSize: '22px',
-              fontWeight: '600',
-              color: '#333333',
-              marginBottom: '32px',
-              lineHeight: '1.3'
-            }}>
+            <p 
+              ref={subtextRef}
+              className="scroll-reveal delay-200"
+              style={{ 
+                fontSize: '22px',
+                fontWeight: '600',
+                color: '#333333',
+                marginBottom: '32px',
+                lineHeight: '1.3'
+              }}
+            >
               {emailSubtext}
             </p>
             
-            <p style={{ 
-              fontSize: '16px',
-              color: '#333333',
-              marginBottom: '24px'
-            }}>
+            <p 
+              ref={descriptionRef}
+              className="scroll-reveal delay-300"
+              style={{ 
+                fontSize: '16px',
+                color: '#333333',
+                marginBottom: '24px'
+              }}
+            >
               Sign up with your email address, pay €1 to get our best opening offer
             </p>
             
-            <div style={{ display: 'flex' }}>
+            <div 
+              ref={formRef}
+              className="scroll-reveal delay-400"
+              style={{ display: 'flex' }}
+            >
               <input
                 type="email"
                 value={email}

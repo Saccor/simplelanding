@@ -6,6 +6,7 @@ import Header from './Header';
 import TextSection from './TextSection';
 import EmailSection from './EmailSection';
 import Footer from './Footer';
+import { initScrollObserver } from '../utils/scrollObserver';
 
 interface SimpleLandingProps {
   // Hero Section Props
@@ -41,6 +42,12 @@ export default function SimpleLanding({
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Initialize scroll observer
+  useEffect(() => {
+    const cleanup = initScrollObserver();
+    return cleanup;
+  }, []);
 
   // Debug logging
   useEffect(() => {
@@ -145,29 +152,16 @@ export default function SimpleLanding({
       </section>
 
       {/* Text Section */}
-      <section className="w-full bg-white">
-        <div className="w-full py-12 md:py-24">
-          <div className="w-[92%] lg:w-[80%] xl:w-[618px] mx-auto px-4 md:px-0">
-            <h2 className="font-normal 
-                       text-[20px] xs:text-[24px] sm:text-[28px] md:text-[40px] lg:text-[50px]
-                       leading-[1.3]
-                       text-center uppercase tracking-[-0.02em] text-[#192124]
-                       transition-all duration-300">
-              {mainHeading}
-            </h2>
-            {subHeading && (
-              <p className="font-normal 
-                        text-[16px] xs:text-[20px] sm:text-[24px] md:text-[32px] lg:text-[40px]
-                        leading-[1.3]
-                        text-center uppercase tracking-[-0.02em] text-[#192124]
-                        transition-all duration-300
-                        mt-4 md:mt-6">
-                {subHeading}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      <TextSection
+        textLines={[
+          "We're building technology that's more than smart",
+          "It's intelligent, sustainable, and designed with purpose.",
+          "This isn't just a company",
+          "It's a challenge to the industry.",
+          "It's a commitment to a better way",
+          "It's a call to everyone who believes in a future where technology works for us—not against us."
+        ]}
+      />
 
       {/* Use the standalone EmailSection component */}
       <EmailSection
