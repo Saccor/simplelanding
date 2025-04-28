@@ -103,30 +103,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Overlay for better visibility */}
           <div className="absolute inset-0 bg-black/30"></div>
 
-          {/* Video Controls */}
-          <button
-            onClick={onToggleMute}
-            className="absolute bottom-6 right-6 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-20"
-            aria-label={isMuted ? "Unmute" : "Mute"}
-          >
-            {isMuted ? (
-              <Image
-                src="/volume-off.svg"
-                alt="Unmute"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-            ) : (
-              <Image
-                src="/volume-on.svg"
-                alt="Mute"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-            )}
-          </button>
+          {/* Removed Video Controls Button */}
         </div>
       </div>
     </section>

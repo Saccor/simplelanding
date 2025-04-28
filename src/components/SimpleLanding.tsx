@@ -108,7 +108,7 @@ export default function SimpleLanding({
       
       {/* Hero Section */}
       <section className="w-full bg-black">
-        <div className="relative" style={{ height: 'calc(100vh - 80px)', minHeight: '520px' }}>
+        <div className="relative" style={{ height: '100vh', minHeight: '520px' }}>
           <video
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover object-center"
@@ -141,20 +141,6 @@ export default function SimpleLanding({
 
           {/* Overlay for better visibility */}
           <div className="absolute inset-0 bg-black/30"></div>
-          
-          {/* Video Controls */}
-          <button
-            onClick={handleToggleMute}
-            className="absolute bottom-6 right-6 p-3 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
-          >
-            <Image
-              src={isMuted ? "/volume-off.svg" : "/volume-on.svg"}
-              alt={isMuted ? "Unmute" : "Mute"}
-              width={24}
-              height={24}
-              className="w-6 h-6 text-white"
-            />
-          </button>
         </div>
       </section>
 
