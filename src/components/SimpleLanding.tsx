@@ -148,6 +148,13 @@ export default function SimpleLanding({
 
           {/* Overlay for better visibility */}
           <div className="absolute inset-0 bg-black/30 z-[1]"></div>
+          
+          {/* Down Arrow */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[2] animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
       </section>
 
