@@ -54,32 +54,17 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   };
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '650px', 
-      background: '#F3F3F3'
-    }}>
-      <div style={{ 
-        maxWidth: '1440px', 
-        height: '100%', 
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'row'
-      }}>
+    <section className="w-full bg-[#F3F3F3]">
+      <div className="w-full max-w-[1440px] mx-auto flex flex-col md:flex-row h-[650px]">
         {/* Left side - Image */}
-        <div style={{ 
-          width: '50%', 
-          height: '100%', 
-          position: 'relative'
-        }}>
+        <div className="w-full md:w-1/2 h-[300px] md:h-full relative">
           <Image
             src={emailImage}
             alt="Arfve earbuds"
             fill
+            className="object-cover transition-opacity duration-500"
             style={{
-              objectFit: 'cover',
-              opacity: imageLoading ? 0 : 1,
-              transition: 'opacity 0.5s ease'
+              opacity: imageLoading ? 0 : 1
             }}
             onLoad={() => setImageLoading(false)}
             priority
@@ -87,106 +72,58 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         </div>
         
         {/* Right side - Content */}
-        <div style={{ 
-          width: '50%', 
-          height: '100%', 
-          background: 'white',
-          padding: '64px 48px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center'
-        }}>
-          <div style={{ maxWidth: '400px' }}>
+        <div className="w-full md:w-1/2 bg-white p-6 md:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="max-w-[400px] mx-auto md:mx-0">
             <h2 
               ref={headingRef}
-              className="scroll-reveal"
-              style={{ 
-                fontSize: '28px',
-                fontWeight: '600',
-                color: '#333333',
-                marginBottom: '16px',
-                lineHeight: '1.3'
-              }}
+              className="scroll-reveal text-2xl md:text-[28px] font-semibold text-[#333333] mb-4 leading-snug"
             >
               {emailHeading}
             </h2>
             
             <p 
               ref={subtextRef}
-              className="scroll-reveal delay-200"
-              style={{ 
-                fontSize: '22px',
-                fontWeight: '600',
-                color: '#333333',
-                marginBottom: '32px',
-                lineHeight: '1.3'
-              }}
+              className="scroll-reveal delay-200 text-lg md:text-[22px] font-semibold text-[#333333] mb-8 leading-snug"
             >
               {emailSubtext}
             </p>
             
             <p 
               ref={descriptionRef}
-              className="scroll-reveal delay-300"
-              style={{ 
-                fontSize: '16px',
-                color: '#333333',
-                marginBottom: '24px'
-              }}
+              className="scroll-reveal delay-300 text-base text-[#333333] mb-6"
             >
               Sign up with your email address, pay €1 to get our best opening offer
             </p>
             
             <div 
               ref={formRef}
-              className="scroll-reveal delay-400"
-              style={{ display: 'flex' }}
+              className="scroll-reveal delay-400 flex"
             >
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email"
-                style={{ 
-                  flex: '1',
-                  padding: '12px 16px',
-                  borderRadius: '9999px',
-                  borderTopRightRadius: 0,
-                  borderBottomRightRadius: 0,
-                  border: '1px solid #D1D5DB',
-                  fontSize: '16px',
-                  outline: 'none'
-                }}
+                className="flex-1 px-4 py-3 rounded-l-full border border-[#D1D5DB] text-base outline-none"
               />
               <button
                 onClick={handleSubmit}
-                style={{ 
-                  backgroundColor: '#B75C31',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '9999px',
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
-                }}
+                className="bg-[#B75C31] text-white px-6 py-3 rounded-r-full border-none text-base font-medium cursor-pointer"
               >
                 Sign-up
               </button>
             </div>
             
             {formState === 'success' && (
-              <p style={{ marginTop: '8px', color: '#059669' }}>Thank you for signing up!</p>
+              <p className="mt-2 text-[#059669]">Thank you for signing up!</p>
             )}
             {formState === 'error' && (
-              <p style={{ marginTop: '8px', color: '#DC2626' }}>Something went wrong. Please try again.</p>
+              <p className="mt-2 text-[#DC2626]">Something went wrong. Please try again.</p>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

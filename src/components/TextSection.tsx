@@ -25,7 +25,6 @@ export default function TextSection({
       if (!containerRef.current) return;
       
       const rect = containerRef.current.getBoundingClientRect();
-      const containerHeight = rect.height;
       const containerTop = rect.top;
       const containerBottom = rect.bottom;
       const windowHeight = window.innerHeight;
@@ -58,19 +57,16 @@ export default function TextSection({
   }, [textLines.length]);
 
   return (
-    <section className="relative flex justify-center bg-white overflow-hidden">
+    <section className="w-full bg-white">
       <div 
         ref={containerRef} 
-        className="relative w-[1440px] h-[522px] flex items-center justify-center"
-        style={{
-          maxWidth: '100%',  // For responsiveness
-        }}
+        className="w-full mx-auto h-[522px] flex items-center justify-center max-w-[1440px]"
       >
-        <div className="absolute inset-0 flex flex-col justify-center items-center w-full h-full px-4 md:px-6">
+        <div className="w-full h-full flex flex-col justify-center items-center px-4 md:px-6 relative">
           {textLines.map((line, i) => (
             <p
               key={i}
-              className="text-line absolute font-normal text-[18px] xs:text-[22px] sm:text-[26px] md:text-[35px] lg:text-[40px] leading-[1.3] text-center tracking-[-0.02em] text-[#192124] transition-all duration-700"
+              className="text-line absolute font-normal text-[18px] xs:text-[22px] sm:text-[26px] md:text-[35px] lg:text-[40px] leading-[1.3] text-center tracking-[-0.02em] text-[#192124] transition-all duration-700 px-2"
               style={{
                 opacity: i === activeIndex ? 1 : 0,
                 transform: i === activeIndex ? 'translateY(0)' : 

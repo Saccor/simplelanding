@@ -5,9 +5,9 @@ import Image from 'next/image';
 const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-white flex justify-center">
-      <div className="footer-container">
+      <div className="w-full max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-24 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
         {/* Logo */}
-        <div style={{ width: '130px' }}>
+        <div className="w-[130px] flex justify-center md:justify-start">
           <Image 
             src="/arfve-logo-dark.svg"
             alt="Arfve"
@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Center links */}
-        <div className="center-links-container">
+        <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 text-sm md:text-base">
           <Link href="#" className="hover:opacity-80 transition-opacity">
             Privacy policy
           </Link>
@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Social Media Icons */}
-        <div className="social-icons-container">
+        <div className="flex items-center gap-4 md:gap-6">
           <Link href="#" aria-label="YouTube" className="hover:opacity-80 transition-opacity">
             <svg className="youtube-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>

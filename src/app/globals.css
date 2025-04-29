@@ -23,9 +23,10 @@ body {
 
 /* Video container aspect ratio preservation */
 .video-container {
-  max-width: 1440px;
   width: 100%;
+  max-width: 1440px;
   position: relative;
+  margin: 0 auto;
 }
 
 .video-container::before {
@@ -45,16 +46,17 @@ body {
 
 /* Text section container */
 .text-container {
-  max-width: 1440px;
   width: 100%;
+  max-width: 1440px;
   position: relative;
   background: #FFFFFF;
   flex: none;
   order: 1;
   flex-grow: 0;
   z-index: 1;
-  min-height: 522px; /* Changed from fixed height to min-height */
-  height: auto; /* Allow container to expand with content on smaller screens */
+  min-height: 522px;
+  height: auto;
+  margin: 0 auto;
 }
 
 /* Remove the ::before pseudo-element that's causing issues */

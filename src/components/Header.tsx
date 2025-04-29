@@ -26,24 +26,10 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
 
   return (
     <header 
-      style={{
-        position: 'fixed',
-        width: '100%',
-        height: '87px',
-        left: '0px',
-        top: '0px',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        isolation: 'isolate',
-        zIndex: 10,
-        maxWidth: '100%'
-      }}
-      className={`${scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'} transition-colors duration-300`}
+      className={`fixed w-full h-[87px] left-0 top-0 flex justify-center items-center z-10 transition-colors duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'}`}
     >
       {/* Sound Button (Right Side) */}
-      <div style={{ position: 'absolute', right: '50px' }}>
+      <div className="absolute right-4 sm:right-8 md:right-12 lg:right-[50px]">
         <button 
           className="text-white w-6 h-6 flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity"
           onClick={onToggleMute}
@@ -66,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
       </div>
       
       {/* Centered Logo */}
-      <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+      <div className="absolute left-1/2 transform -translate-x-1/2">
         <Image 
           src="/arfve-logo.svg"
           alt="Arfve"
