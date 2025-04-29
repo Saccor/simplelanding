@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  env: {
+    MAILERLITE_API_KEY: process.env.MAILERLITE_API_KEY,
+  },
   images: {
     remotePatterns: [
       {
@@ -9,6 +12,7 @@ const nextConfig = {
         pathname: '**',
       },
     ],
+    domains: ['assets.example.com'],
   },
   // Only add webpack config when not using Turbopack
   ...(process.env.TURBOPACK ? {} : {

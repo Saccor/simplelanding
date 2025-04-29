@@ -4,16 +4,17 @@ import React, { useState, useRef, useEffect, CSSProperties } from 'react';
 import Image from 'next/image';
 import useScrollObserver from '../hooks/useScrollObserver';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
-import { addSubscriber } from '../services/mailerLite';
+import { addSubscriber, addSubscriberToGroup } from '../services/mailerLite';
 import MailerLiteScripts from './MailerLiteScripts';
+import MailerLiteForm from './MailerLiteForm';
+import { MAILERLITE_ACCOUNT_ID, MAILERLITE_FORM_ID, USE_EMBEDDED_FORM, MAILERLITE_API_KEY, MAILERLITE_GROUP_ID } from '../config/mailerLite';
+
+// Debug log - remove in production
+console.log("API Key Status:", MAILERLITE_API_KEY ? "Set" : "Not Set");
+console.log("Group ID Status:", MAILERLITE_GROUP_ID ? "Set" : "Not Set");
 
 // You can use either the API approach or the embedded form approach
-// Set to true to use the embedded form, false to use the API
-const USE_EMBEDDED_FORM = false;
-
-// Replace these with your actual MailerLite credentials
-const MAILERLITE_ACCOUNT_ID = 'your_account_id';
-const MAILERLITE_FORM_ID = 'your_form_id';
+// Configuration is set in src/config/mailerLite.ts
 
 interface EmailSectionProps {
   emailHeading: string;
@@ -60,8 +61,10 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   // Setup embedded form if using that approach
   useEffect(() => {
     if (USE_EMBEDDED_FORM && mounted && embeddedFormRef.current) {
-      // Clear any previous content
-      embeddedFormRef.current.innerHTML = '';
+      // Only try to clear if there are children
+      if (embeddedFormRef.current.firstChild) {
+        embeddedFormRef.current.innerHTML = '';
+      }
       
       // Create the embedded form div
       const formDiv = document.createElement('div');
@@ -96,18 +99,58 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         setEmail('');
       } else {
         // Use our API integration
-        await addSubscriber({ 
+        if (!MAILERLITE_API_KEY) {
+          console.error('Missing MailerLite API key - please add to .env.local file');
+          setFormState('error');
+          return;
+        }
+
+        console.log('Submitting email via API integration...');
+        const userData = { 
           email,
           // You can add additional fields as needed
           fields: {
             source: 'website_signup',
             signup_date: new Date().toISOString()
           }
-        });
+        };
         
-        console.log('Email submitted to MailerLite:', email);
-        setFormState('success');
-        setEmail('');
+        try {
+          // First try adding to a specific group if group ID is available
+          if (MAILERLITE_GROUP_ID) {
+            console.log(`Attempting to add to group ${MAILERLITE_GROUP_ID}...`);
+            await addSubscriberToGroup(MAILERLITE_GROUP_ID, userData);
+            console.log('Successfully added to group');
+          } else {
+            // Fallback to just adding subscriber without group
+            console.log('No group ID available, adding subscriber directly');
+            await addSubscriber(userData);
+            console.log('Successfully added subscriber');
+          }
+          
+          console.log('Email submitted to MailerLite:', email);
+          setFormState('success');
+          setEmail('');
+        } catch (apiError) {
+          console.error('First attempt failed:', apiError);
+          
+          // If adding to group fails, try just adding the subscriber
+          if (MAILERLITE_GROUP_ID) {
+            try {
+              console.log('Falling back to adding subscriber without group');
+              await addSubscriber(userData);
+              console.log('Fallback successful');
+              setFormState('success');
+              setEmail('');
+              return;
+            } catch (fallbackError) {
+              console.error('Fallback attempt failed:', fallbackError);
+            }
+          }
+          
+          // If we reach here, both attempts failed
+          throw apiError;
+        }
       }
     } catch (error) {
       console.error('Error submitting email:', error);
@@ -179,6 +222,9 @@ const EmailSection: React.FC<EmailSectionProps> = ({
 
   // Only use desktop layout on desktop sizes
   const useDesktopLayout = mounted && (isDesktop || isLargeDesktop);
+
+  // If not using embedded form and no API key, show custom message in form
+  const isApiConfigured = USE_EMBEDDED_FORM ? !!MAILERLITE_FORM_ID : !!MAILERLITE_API_KEY;
 
   return (
     <>
@@ -325,7 +371,15 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                       ref={embeddedFormRef} 
                       className="w-full"
                       style={{ minHeight: '44px' }}
-                    />
+                    >
+                      {MAILERLITE_FORM_ID ? (
+                        <MailerLiteForm formId={MAILERLITE_FORM_ID} className="w-full" />
+                      ) : (
+                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                          MailerLite form ID not configured. Please add it to your environment variables.
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     // Custom form with API integration
                     <div 
@@ -339,64 +393,72 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                         height: '44px'
                       }}
                     >
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email"
-                        style={{
-                          boxSizing: 'border-box',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          padding: '10px 20px',
-                          gap: '10px',
-                          width: '311.79px',
-                          height: '44px',
-                          background: '#FFFFFF',
-                          border: '1px solid rgba(0, 0, 0, 0.48)',
-                          borderRadius: '28px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 400,
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          textAlign: 'center',
-                          color: '#000000',
-                          flex: 1
-                        }}
-                        autoComplete="email"
-                      />
-                      
-                      <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '10px 20px',
-                          gap: '10px',
-                          width: '98px',
-                          height: '44px',
-                          background: '#B4694A',
-                          borderRadius: '55px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 500,
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          textAlign: 'center',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Sign-up
-                      </button>
+                      {!MAILERLITE_API_KEY ? (
+                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                          MailerLite API key not configured. Please add it to your environment variables.
+                        </p>
+                      ) : (
+                        <>
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="email"
+                            style={{
+                              boxSizing: 'border-box',
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              padding: '10px 20px',
+                              gap: '10px',
+                              width: '311.79px',
+                              height: '44px',
+                              background: '#FFFFFF',
+                              border: '1px solid rgba(0, 0, 0, 0.48)',
+                              borderRadius: '28px',
+                              fontFamily: "'Poppins', sans-serif",
+                              fontStyle: 'normal',
+                              fontWeight: 400,
+                              fontSize: '14px',
+                              lineHeight: '20px',
+                              textAlign: 'center',
+                              color: '#000000',
+                              flex: 1
+                            }}
+                            autoComplete="email"
+                          />
+                          
+                          <button
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '10px 20px',
+                              gap: '10px',
+                              width: '98px',
+                              height: '44px',
+                              background: '#B4694A',
+                              borderRadius: '55px',
+                              fontFamily: "'Poppins', sans-serif",
+                              fontStyle: 'normal',
+                              fontWeight: 500,
+                              fontSize: '14px',
+                              lineHeight: '20px',
+                              textAlign: 'center',
+                              color: '#FFFFFF',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Sign-up
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                   
@@ -541,7 +603,15 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                       ref={embeddedFormRef} 
                       className="w-full"
                       style={{ minHeight: isExtraSmall ? '40px' : '44px' }}
-                    />
+                    >
+                      {MAILERLITE_FORM_ID ? (
+                        <MailerLiteForm formId={MAILERLITE_FORM_ID} className="w-full" />
+                      ) : (
+                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                          MailerLite form ID not configured. Please add it to your environment variables.
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     // Custom form with API integration
                     <div 
@@ -555,63 +625,71 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                         height: isExtraSmall ? '40px' : '44px'
                       }}
                     >
-                      <input
-                        type="email"
-                        id="email-mobile"
-                        name="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email"
-                        style={{
-                          boxSizing: 'border-box',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                          gap: '10px',
-                          height: isExtraSmall ? '40px' : '44px',
-                          background: '#FFFFFF',
-                          border: '1px solid rgba(0, 0, 0, 0.48)',
-                          borderRadius: '28px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 400,
-                          fontSize: isExtraSmall ? '12px' : '14px',
-                          lineHeight: isExtraSmall ? '18px' : '20px',
-                          textAlign: 'center',
-                          color: '#000000',
-                          flex: 1
-                        }}
-                        autoComplete="email"
-                      />
-                      
-                      <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                          gap: '10px',
-                          width: isExtraSmall ? '90px' : '98px',
-                          height: isExtraSmall ? '40px' : '44px',
-                          background: '#B4694A',
-                          borderRadius: '55px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 500,
-                          fontSize: isExtraSmall ? '12px' : '14px',
-                          lineHeight: isExtraSmall ? '18px' : '20px',
-                          textAlign: 'center',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Sign-up
-                      </button>
+                      {!MAILERLITE_API_KEY ? (
+                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                          MailerLite API key not configured. Please add it to your environment variables.
+                        </p>
+                      ) : (
+                        <>
+                          <input
+                            type="email"
+                            id="email-mobile"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="email"
+                            style={{
+                              boxSizing: 'border-box',
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                              gap: '10px',
+                              height: isExtraSmall ? '40px' : '44px',
+                              background: '#FFFFFF',
+                              border: '1px solid rgba(0, 0, 0, 0.48)',
+                              borderRadius: '28px',
+                              fontFamily: "'Poppins', sans-serif",
+                              fontStyle: 'normal',
+                              fontWeight: 400,
+                              fontSize: isExtraSmall ? '12px' : '14px',
+                              lineHeight: isExtraSmall ? '18px' : '20px',
+                              textAlign: 'center',
+                              color: '#000000',
+                              flex: 1
+                            }}
+                            autoComplete="email"
+                          />
+                          
+                          <button
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                              gap: '10px',
+                              width: isExtraSmall ? '90px' : '98px',
+                              height: isExtraSmall ? '40px' : '44px',
+                              background: '#B4694A',
+                              borderRadius: '55px',
+                              fontFamily: "'Poppins', sans-serif",
+                              fontStyle: 'normal',
+                              fontWeight: 500,
+                              fontSize: isExtraSmall ? '12px' : '14px',
+                              lineHeight: isExtraSmall ? '18px' : '20px',
+                              textAlign: 'center',
+                              color: '#FFFFFF',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Sign-up
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                   
