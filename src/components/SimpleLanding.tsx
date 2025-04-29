@@ -67,6 +67,12 @@ export default function SimpleLanding({
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
     
+    // Force video to play if browser paused it due to autoplay restrictions
+    const videoElement = document.querySelector('video');
+    if (videoElement && videoElement.paused && !newMutedState) {
+      videoElement.play().catch(err => console.error('Error playing video:', err));
+    }
+    
     // Notify parent component if callback provided
     if (onMuteChange) {
       onMuteChange(newMutedState);

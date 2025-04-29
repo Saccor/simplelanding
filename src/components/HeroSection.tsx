@@ -52,6 +52,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('error', handleError as EventListener);
+    
+    // Add play event listener for debugging
+    video.addEventListener('play', () => {
+      console.log('Video playing, muted:', video.muted);
+    });
+    
+    // Add pause event listener for debugging
+    video.addEventListener('pause', () => {
+      console.log('Video paused');
+    });
+    
     video.load();
 
     return () => {
@@ -64,6 +75,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isMuted;
+      
+      // If unmuting, also ensure video is playing (fixes autoplay policy issues)
+      if (!isMuted && videoRef.current.paused) {
+        videoRef.current.play().catch(error => {
+          console.error('Failed to play video after unmuting:', error);
+        });
+      }
     }
   }, [isMuted]);
 
@@ -138,115 +156,105 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section 
-      ref={sectionRef}
-      className="w-full bg-black"
-      style={{ 
-        height: '100vh', // Full viewport height
-        position: 'relative',
-        minHeight: '520px',
-        width: '100%'
+      ref={sectionRef} 
+      className="relative w-full h-screen overflow-hidden bg-black"
+      style={{
+        minHeight: '520px'
       }}
     >
-      <div className="relative w-full h-full">
-        <video
-          ref={videoRef}
-          className={`
-            absolute inset-0 w-full h-full
-            object-cover object-center
-            transition-opacity duration-700
-            ${isVideoLoading ? 'opacity-0' : 'opacity-100'}
-          `}
-          playsInline
-          muted={isMuted}
-          loop
-          autoPlay
-          preload="auto"
-          controls={false}
-          crossOrigin="anonymous"
-        >
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        playsInline
+        muted={isMuted}
+        loop
+        autoPlay
+        preload="auto"
+        controls={false}
+        crossOrigin="anonymous"
+      >
+        <source 
+          src={videoUrl} 
+          type="video/mp4" 
+        />
+        {mobileVideoUrl && (
           <source 
-            src={videoUrl} 
+            src={mobileVideoUrl} 
             type="video/mp4" 
+            media="(max-width: 768px)"
           />
-          {mobileVideoUrl && (
-            <source 
-              src={mobileVideoUrl} 
-              type="video/mp4" 
-              media="(max-width: 768px)"
-            />
-          )}
-          Your browser does not support the video tag.
-        </video>
-        
-        {/* Loading Spinner */}
-        {isVideoLoading && (
-          <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-          </div>
         )}
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Loading Spinner */}
+      {isVideoLoading && (
+        <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center z-10">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
 
-        {/* Overlay for better visibility */}
-        <div className="absolute inset-0 bg-black/30"></div>
+      {/* Subtle Overlay for better visibility */}
+      <div className="absolute inset-0 bg-black/20"></div>
 
-        {/* Scroll Down Button - Centered at bottom */}
-        <button 
-          onClick={handleScrollDown}
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[3] flex flex-col items-center cursor-pointer focus:outline-none group scroll-down-btn"
-          aria-label="Scroll down to content"
-          style={{
-            bottom: '10%' // Position from bottom
-          }}
-        >
-          <div className="animate-bounce">
-            <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 1.81059L36 21.0569L70 1.8106" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-        </button>
+      {/* Scroll Down Button - Centered at bottom */}
+      <button 
+        onClick={handleScrollDown}
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[3] flex flex-col items-center cursor-pointer focus:outline-none group scroll-down-btn"
+        aria-label="Scroll down to content"
+        style={{
+          bottom: '5%' // Position from bottom
+        }}
+      >
+        <div className="animate-bounce">
+          <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 1.81059L36 21.0569L70 1.8106" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </button>
 
-        {/* Sound Button - Absolute position in Hero section */}
+      {/* Sound Button - Absolute position in Hero section */}
+      <div 
+        className="absolute z-[5]"
+        style={{ 
+          top: buttonPosition.top,
+          right: buttonPosition.right
+        }}
+      >
         <div 
-          className="absolute z-[5]"
           style={{ 
-            top: buttonPosition.top,
-            right: buttonPosition.right
+            width: buttonSize.width,
+            height: buttonSize.height,
+            background: '#333333',
+            borderRadius: '4px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: mounted && isExtraSmall ? '2px 1px' : '4px 2px'
           }}
         >
-          <div 
-            style={{ 
-              width: buttonSize.width,
-              height: buttonSize.height,
-              background: '#333333',
-              borderRadius: '4px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: mounted && isExtraSmall ? '2px 1px' : '4px 2px'
-            }}
+          <button 
+            onClick={onToggleMute}
+            aria-label={isMuted ? "Unmute" : "Mute"}
+            className="flex items-center justify-center w-full h-full"
           >
-            <button 
-              onClick={onToggleMute}
-              aria-label={isMuted ? "Unmute" : "Mute"}
-              className="flex items-center justify-center w-full h-full"
-            >
-              <span className="sr-only">{isMuted ? "Unmute" : "Mute"}</span>
-              {isMuted ? (
-                // Muted version
-                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
-                  <line x1="23" y1="9" x2="17" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="17" y1="9" x2="23" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              ) : (
-                // Unmuted version
-                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
-                  <path d="M15.54 8.46C16.1528 9.07286 16.496 9.91307 16.496 10.79C16.496 11.6669 16.1528 12.5071 15.54 13.12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M19.07 4.93C20.9447 6.80528 21.9979 9.34836 21.9979 12C21.9979 14.6516 20.9447 17.1947 19.07 19.07" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-            </button>
-          </div>
+            <span className="sr-only">{isMuted ? "Unmute" : "Mute"}</span>
+            {isMuted ? (
+              // Muted version
+              <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
+                <line x1="23" y1="9" x2="17" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="17" y1="9" x2="23" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            ) : (
+              // Unmuted version
+              <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
+                <path d="M15.54 8.46C16.1528 9.07286 16.496 9.91307 16.496 10.79C16.496 11.6669 16.1528 12.5071 15.54 13.12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M19.07 4.93C20.9447 6.80528 21.9979 9.34836 21.9979 12C21.9979 14.6516 20.9447 17.1947 19.07 19.07" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </section>
