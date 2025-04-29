@@ -20,6 +20,13 @@ export default function TextSection({
 }: TextSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
+
+  // This will help avoid hydration mismatches
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
 
@@ -113,7 +120,8 @@ export default function TextSection({
     }
   };
 
-  const textPosition = getTextPosition();
+  // Only get text position if mounted to avoid hydration mismatch
+  const textPosition = mounted ? getTextPosition() : { width: '618px', fontSize: '40px', lineHeight: '60px' };
 
   // Section height adjusts for mobile
   const getSectionHeight = () => {
@@ -123,12 +131,15 @@ export default function TextSection({
     return '522px';
   };
 
+  // Only get section height if mounted to avoid hydration mismatch
+  const sectionHeight = mounted ? getSectionHeight() : '522px';
+
   return (
     <section className="w-full bg-white">
       <div 
         ref={containerRef} 
         className="w-full mx-auto flex items-center justify-center max-w-[1440px] relative"
-        style={{ height: getSectionHeight() }}
+        style={{ height: sectionHeight }}
       >
         <div className="relative w-full h-full flex items-center justify-center">
           {textLines.map((line, i) => (
@@ -151,12 +162,12 @@ export default function TextSection({
                   lineHeight: textPosition.lineHeight,
                   maxWidth: '100%',
                   height: 'auto',
-                  minHeight: isExtraSmall ? '50px' : isMobile ? '80px' : '120px', // Reduced min height for extra small screens
+                  minHeight: mounted ? (isExtraSmall ? '50px' : isMobile ? '80px' : '120px') : '120px', // Use static value before mounting
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: isExtraSmall ? '0 4px' : '0',
-                  wordBreak: isExtraSmall ? 'break-word' : 'normal' // Allow word breaking on very small screens
+                  padding: mounted && isExtraSmall ? '0 4px' : '0',
+                  wordBreak: mounted && isExtraSmall ? 'break-word' : 'normal' // Use static value before mounting
                 }}
               >
                 {line}

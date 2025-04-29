@@ -20,6 +20,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
+  const [mounted, setMounted] = useState(false);
   const { width, isMobile, isTablet } = useWindowSize();
   
   // Refs for scroll animations
@@ -27,6 +28,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // This will help avoid hydration mismatches
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Add Poppins font
   useEffect(() => {
@@ -133,7 +139,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       return {
         position: 'relative' as const,
         width: '100%',
-        height: '280px',
+        height: '340px',
         overflow: 'hidden' as const,
       };
     } else if (isMobile) {
@@ -213,19 +219,73 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     };
   };
 
-  // Calculate styles
-  const sectionStyle = getSectionStyle();
-  const imageStyle = getImageStyle();
-  const rightContentStyle = getRightContentStyle();
-  const formStyle = getFormStyle();
-  const headingStyle = getHeadingStyle();
+  // Calculate styles - only if mounted to avoid hydration mismatch
+  const sectionStyle = mounted ? getSectionStyle() : {
+    width: '100%',
+    maxWidth: '1440px',
+    background: '#F3F3F3',
+    position: 'relative' as const,
+    flexGrow: 0,
+    zIndex: 2,
+    margin: '0 auto',
+    overflow: 'hidden' as const,
+    display: 'flex' as const,
+    flexDirection: 'row' as const,
+  };
+  
+  const imageStyle = mounted ? getImageStyle() : {
+    position: 'relative' as const,
+    width: '100%',
+    height: '650px',
+    overflow: 'hidden' as const,
+  };
+  
+  const rightContentStyle = mounted ? getRightContentStyle() : {
+    position: 'relative' as const,
+    width: '607px',
+    height: 'auto',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    padding: '0px',
+    gap: '42px',
+    maxWidth: 'calc(100% - 30px)',
+  };
+  
+  const formStyle = mounted ? getFormStyle() : {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    padding: '12px 0px',
+    gap: '30px',
+    width: '421.79px',
+    height: 'auto',
+    filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+    borderRadius: '20px',
+    maxWidth: '100%',
+    fontSize: '18px',
+    lineHeight: '28px',
+  };
+  
+  const headingStyle = mounted ? getHeadingStyle() : {
+    width: '100%',
+    height: 'auto',
+    fontFamily: "'Poppins', sans-serif",
+    fontStyle: 'normal' as const,
+    fontWeight: 600,
+    fontSize: '30px',
+    lineHeight: '38px',
+    color: '#192124',
+    margin: 0,
+    maxWidth: '100%'
+  };
 
   return (
     <section style={sectionStyle}>
       {/* Left side - Image */}
       <div style={{
         ...imageStyle,
-        flex: isMobile || isExtraSmall ? 'none' : '0 0 40%'
+        flex: mounted && (isMobile || isExtraSmall) ? 'none' : '0 0 40%'
       }}>
         <Image
           src={emailImage}
@@ -234,7 +294,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 488px"
           style={{
             objectFit: 'cover',
-            objectPosition: isExtraSmall ? 'center top' : 'center', // Focus on top part of image for small screens
+            objectPosition: mounted && isExtraSmall ? 'center 30%' : 'center',
             opacity: imageLoading ? 0 : 1,
             transition: 'opacity 0.5s ease'
           }}
@@ -246,8 +306,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       {/* Right side - Content */}
       <div style={{
         ...rightContentStyle,
-        flex: isMobile || isExtraSmall ? 'none' : '0 0 60%',
-        padding: isMobile || isExtraSmall ? '20px 16px' : '135.5px 40px 40px 40px',
+        flex: mounted && (isMobile || isExtraSmall) ? 'none' : '0 0 60%',
+        padding: mounted && (isMobile || isExtraSmall) ? '20px 16px' : '135.5px 40px 40px 40px',
       }}>
         {/* Heading section */}
         <div style={{
@@ -255,7 +315,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           flexDirection: 'column',
           alignItems: 'flex-start',
           padding: '0px',
-          gap: isExtraSmall ? '12px' : isMobile ? '16px' : '28px', // Smaller gap for extra small screens
+          gap: mounted ? (isExtraSmall ? '12px' : isMobile ? '16px' : '28px') : '28px',
           width: '100%',
           maxWidth: '607px',
           height: 'auto'
