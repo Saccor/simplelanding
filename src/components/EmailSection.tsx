@@ -21,13 +21,14 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
   const [mounted, setMounted] = useState(false);
-  const { width, isMobile, isTablet } = useWindowSize();
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
   
   // Refs for scroll animations
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subtextRef = useRef<HTMLParagraphElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   // This will help avoid hydration mismatches
   useEffect(() => {
@@ -75,271 +76,499 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   // Check if device is extra small (iPhone SE size)
   const isExtraSmall = mounted && width <= breakpoints.xs;
 
+  // Calculate text sizes based on screen size
+  const getTextSizes = () => {
+    if (isLargeDesktop || isDesktop) {
+      return {
+        headingSize: '30px',
+        headingLineHeight: '38px',
+        descriptionSize: '18px',
+        descriptionLineHeight: '28px',
+        gap: '28px',
+        formGap: '30px',
+        formPadding: '20px 0px'
+      };
+    } else if (isTablet) {
+      return {
+        headingSize: '28px',
+        headingLineHeight: '36px',
+        descriptionSize: '16px',
+        descriptionLineHeight: '24px',
+        gap: '20px',
+        formGap: '24px',
+        formPadding: '15px 0px'
+      };
+    } else if (isExtraSmall) {
+      return {
+        headingSize: '20px',
+        headingLineHeight: '28px',
+        descriptionSize: '14px',
+        descriptionLineHeight: '20px',
+        gap: '12px',
+        formGap: '12px',
+        formPadding: '0px'
+      };
+    } else {
+      return {
+        headingSize: '24px',
+        headingLineHeight: '32px',
+        descriptionSize: '16px',
+        descriptionLineHeight: '24px',
+        gap: '16px',
+        formGap: '16px',
+        formPadding: '10px 0px'
+      };
+    }
+  };
+
+  // Get text sizes
+  const textSizes = mounted ? getTextSizes() : {
+    headingSize: '30px',
+    headingLineHeight: '38px',
+    descriptionSize: '18px',
+    descriptionLineHeight: '28px',
+    gap: '28px',
+    formGap: '30px',
+    formPadding: '20px 0px'
+  };
+
+  // Only use desktop layout on desktop sizes
+  const useDesktopLayout = mounted && (isDesktop || isLargeDesktop);
+
   return (
     <section 
-      className="w-full flex justify-center"
+      ref={sectionRef}
+      className="w-full flex justify-center bg-[#F3F3F3]"
       style={{
-        position: 'relative',
-        width: isMobile ? '100%' : '1440px',
-        height: isMobile ? 'auto' : '650px',
-        background: '#F3F3F3',
-        flex: 'none',
+        zIndex: 2,
         order: 2,
         alignSelf: 'stretch',
-        flexGrow: 0,
-        zIndex: 2,
-        margin: '0 auto',
-        maxWidth: '100%'
+        flexGrow: 0
       }}
     >
-      {/* Left side - Image */}
-      <div
+      <div 
+        className="w-full max-w-[1440px] relative"
         style={{
-          position: isMobile ? 'relative' : 'absolute',
-          width: isMobile ? '100%' : '488px',
-          height: isMobile ? isExtraSmall ? '340px' : '400px' : '650px',
-          left: isMobile ? 'auto' : '0px',
-          top: isMobile ? 'auto' : '0px',
-          overflow: 'hidden'
+          height: useDesktopLayout ? '650px' : 'auto'
         }}
       >
-        <Image
-          src={emailImage}
-          alt="Arfve earbuds"
-          fill
-          sizes="(max-width: 768px) 100vw, 488px"
-          style={{
-            objectFit: 'cover',
-            objectPosition: 'center',
-            opacity: imageLoading ? 0 : 1,
-            transition: 'opacity 0.5s ease'
-          }}
-          onLoad={() => setImageLoading(false)}
-          priority
-          quality={90}
-        />
-      </div>
-      
-      {/* Right Content Container - Frame 481534 */}
-      <div
-        style={mounted ? {
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          padding: isMobile ? (isExtraSmall ? '24px 20px' : '32px 24px') : '0px',
-          gap: '42px',
-          position: isMobile ? 'relative' : 'absolute',
-          width: isMobile ? '100%' : '607px',
-          height: isMobile ? 'auto' : '354px',
-          left: isMobile ? '0px' : '653.99px',
-          top: isMobile ? '0px' : '135.5px',
-        } : undefined}
-      >
-        {/* Heading Container - Frame 481531 */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            padding: '0px',
-            gap: '28px',
-            width: isMobile ? '100%' : '607px',
-            height: isMobile ? 'auto' : '142px',
-            flex: 'none',
-            order: 0,
-            alignSelf: 'stretch',
-            flexGrow: 0
-          }}
-        >
-          {/* Main Heading */}
-          <h2 
-            ref={headingRef}
-            className="scroll-reveal"
-            style={{
-              width: isMobile ? '100%' : '607px',
-              height: isMobile ? 'auto' : '76px',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 600,
-              fontSize: isExtraSmall ? '20px' : isMobile ? '24px' : '30px',
-              lineHeight: isExtraSmall ? '28px' : isMobile ? '32px' : '38px',
-              color: '#192124',
-              flex: 'none',
-              order: 0,
-              alignSelf: 'stretch',
-              flexGrow: 0
-            }}
-          >
-            {emailHeading}
-          </h2>
-          
-          {/* Subheading */}
-          <p 
-            ref={subtextRef}
-            className="scroll-reveal delay-200"
-            style={{
-              width: isMobile ? '100%' : '607px',
-              height: isMobile ? 'auto' : '38px',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 600,
-              fontSize: isExtraSmall ? '20px' : isMobile ? '24px' : '30px',
-              lineHeight: isExtraSmall ? '28px' : isMobile ? '32px' : '38px',
-              color: '#192124',
-              flex: 'none',
-              order: 1,
-              alignSelf: 'stretch',
-              flexGrow: 0
-            }}
-          >
-            {emailSubtext}
-          </p>
-        </div>
-        
-        {/* Form Container - Frame 481518 */}
-        <div
-          ref={formRef}
-          className="scroll-reveal delay-300"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            padding: isMobile ? '0px' : '20px 0px',
-            gap: isMobile ? '16px' : '30px',
-            width: isMobile ? '100%' : '421.79px',
-            height: isMobile ? 'auto' : '170px',
-            filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-            borderRadius: '20px',
-            flex: 'none',
-            order: 1,
-            flexGrow: 0
-          }}
-        >
-          {/* Form Description */}
-          <p 
-            ref={descriptionRef}
-            style={{
-              width: isMobile ? '100%' : '421.79px',
-              height: isMobile ? 'auto' : '56px',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 400,
-              fontSize: isExtraSmall ? '14px' : isMobile ? '16px' : '18px',
-              lineHeight: isExtraSmall ? '20px' : isMobile ? '24px' : '28px',
-              color: '#192124',
-              flex: 'none',
-              order: 0,
-              alignSelf: 'stretch',
-              flexGrow: 0
-            }}
-          >
-            Sign up with your email address, pay €1 to get our best opening offer
-          </p>
-          
-          {/* Input Row - Frame 481510 */}
-          <div 
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: '0px',
-              gap: '12px',
-              width: isMobile ? '100%' : '421.79px',
-              height: isExtraSmall ? '40px' : '44px',
-              flex: 'none',
-              order: 1,
-              alignSelf: 'stretch',
-              flexGrow: 0
-            }}
-          >
-            {/* Email Input Field */}
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email"
+        {/* For Desktop: Absolute positioned elements */}
+        {useDesktopLayout && (
+          <>
+            {/* Image - Desktop */}
+            <div
               style={{
-                boxSizing: 'border-box',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                gap: '10px',
-                width: isMobile ? '100%' : '311.79px',
-                height: isExtraSmall ? '40px' : '44px',
-                background: '#FFFFFF',
-                border: '1px solid rgba(0, 0, 0, 0.48)',
-                borderRadius: '28px',
-                flex: 'none',
-                order: 0,
-                flexGrow: 1,
-                fontFamily: "'Poppins', sans-serif",
-                fontStyle: 'normal',
-                fontWeight: 400,
-                fontSize: isExtraSmall ? '12px' : '14px',
-                lineHeight: isExtraSmall ? '18px' : '20px',
-                textAlign: 'center',
-                color: '#000000'
-              }}
-              autoComplete="email"
-            />
-            
-            {/* Sign Up Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                gap: '10px',
-                width: isExtraSmall ? '90px' : '98px',
-                height: isExtraSmall ? '40px' : '44px',
-                background: '#B4694A',
-                borderRadius: '55px',
-                flex: 'none',
-                order: 1,
-                flexGrow: 0,
-                fontFamily: "'Poppins', sans-serif",
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: isExtraSmall ? '12px' : '14px',
-                lineHeight: isExtraSmall ? '18px' : '20px',
-                textAlign: 'center',
-                color: '#FFFFFF',
-                border: 'none',
-                cursor: 'pointer'
+                position: 'absolute',
+                width: '488px',
+                height: '650px',
+                left: '0px',
+                top: '0px',
+                overflow: 'hidden'
               }}
             >
-              Sign-up
-            </button>
+              <Image
+                src={emailImage}
+                alt="Arfve earbuds"
+                fill
+                sizes="488px"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  opacity: imageLoading ? 0 : 1,
+                  transition: 'opacity 0.5s ease'
+                }}
+                onLoad={() => setImageLoading(false)}
+                priority
+                quality={90}
+              />
+            </div>
+            
+            {/* Content - Desktop */}
+            <div
+              style={{
+                position: 'absolute',
+                left: isLargeDesktop ? '653.99px' : width > 1200 ? '610px' : '580px',
+                top: '135.5px',
+                width: isLargeDesktop ? '607px' : '580px',
+                zIndex: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '42px'
+              }}
+            >
+              {/* Heading Container */}
+              <div 
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: '0px',
+                  gap: textSizes.gap,
+                  width: '100%'
+                }}
+              >
+                <h2 
+                  ref={headingRef}
+                  className="scroll-reveal"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailHeading}
+                </h2>
+                
+                <p 
+                  ref={subtextRef}
+                  className="scroll-reveal delay-200"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailSubtext}
+                </p>
+              </div>
+              
+              {/* Form Container */}
+              <div
+                ref={formRef}
+                className="scroll-reveal delay-300"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: textSizes.formPadding,
+                  gap: textSizes.formGap,
+                  width: '421.79px',
+                  filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+                  borderRadius: '20px'
+                }}
+              >
+                <p 
+                  ref={descriptionRef}
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    fontSize: textSizes.descriptionSize,
+                    lineHeight: textSizes.descriptionLineHeight,
+                    color: '#192124',
+                    width: '100%'
+                  }}
+                >
+                  Sign up with your email address, pay €1 to get our best opening offer
+                </p>
+                
+                <div 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '0px',
+                    gap: '12px',
+                    width: '100%',
+                    height: '44px'
+                  }}
+                >
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email"
+                    style={{
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: '10px 20px',
+                      gap: '10px',
+                      width: '311.79px',
+                      height: '44px',
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(0, 0, 0, 0.48)',
+                      borderRadius: '28px',
+                      fontFamily: "'Poppins', sans-serif",
+                      fontStyle: 'normal',
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      textAlign: 'center',
+                      color: '#000000',
+                      flex: 1
+                    }}
+                    autoComplete="email"
+                  />
+                  
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '10px 20px',
+                      gap: '10px',
+                      width: '98px',
+                      height: '44px',
+                      background: '#B4694A',
+                      borderRadius: '55px',
+                      fontFamily: "'Poppins', sans-serif",
+                      fontStyle: 'normal',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      textAlign: 'center',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sign-up
+                  </button>
+                </div>
+                
+                {/* Success/Error Messages */}
+                {mounted && formState === 'success' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#059669',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: '14px'
+                  }}>
+                    Thank you for signing up!
+                  </p>
+                )}
+                {mounted && formState === 'error' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#DC2626',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: '14px'
+                  }}>
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+        
+        {/* For Mobile and Tablet: Stacked layout */}
+        {!useDesktopLayout && (
+          <div className="flex flex-col w-full">
+            {/* Image - Mobile */}
+            <div
+              style={{
+                width: '100%',
+                height: isExtraSmall ? '320px' : isTablet ? '400px' : '380px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              <Image
+                src={emailImage}
+                alt="Arfve earbuds"
+                fill
+                sizes="100vw"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  opacity: imageLoading ? 0 : 1,
+                  transition: 'opacity 0.5s ease'
+                }}
+                onLoad={() => setImageLoading(false)}
+                priority
+                quality={90}
+              />
+            </div>
+            
+            {/* Content - Mobile */}
+            <div
+              className="w-full"
+              style={{
+                padding: isExtraSmall ? '24px 20px' : isTablet ? '40px 24px' : '32px 24px',
+                gap: isExtraSmall ? '24px' : '42px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* Heading Container */}
+              <div 
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: textSizes.gap,
+                  width: '100%'
+                }}
+              >
+                <h2 
+                  ref={headingRef}
+                  className="scroll-reveal"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailHeading}
+                </h2>
+                
+                <p 
+                  ref={subtextRef}
+                  className="scroll-reveal delay-200"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailSubtext}
+                </p>
+              </div>
+              
+              {/* Form Container */}
+              <div
+                ref={formRef}
+                className="scroll-reveal delay-300 w-full"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: textSizes.formPadding,
+                  gap: textSizes.formGap,
+                  filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+                  borderRadius: '20px'
+                }}
+              >
+                <p 
+                  ref={descriptionRef}
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    fontSize: textSizes.descriptionSize,
+                    lineHeight: textSizes.descriptionLineHeight,
+                    color: '#192124',
+                    width: '100%'
+                  }}
+                >
+                  Sign up with your email address, pay €1 to get our best opening offer
+                </p>
+                
+                <div 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '0px',
+                    gap: '12px',
+                    width: '100%',
+                    height: isExtraSmall ? '40px' : '44px'
+                  }}
+                >
+                  <input
+                    type="email"
+                    id="email-mobile"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email"
+                    style={{
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                      gap: '10px',
+                      height: isExtraSmall ? '40px' : '44px',
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(0, 0, 0, 0.48)',
+                      borderRadius: '28px',
+                      fontFamily: "'Poppins', sans-serif",
+                      fontStyle: 'normal',
+                      fontWeight: 400,
+                      fontSize: isExtraSmall ? '12px' : '14px',
+                      lineHeight: isExtraSmall ? '18px' : '20px',
+                      textAlign: 'center',
+                      color: '#000000',
+                      flex: 1
+                    }}
+                    autoComplete="email"
+                  />
+                  
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                      gap: '10px',
+                      width: isExtraSmall ? '90px' : '98px',
+                      height: isExtraSmall ? '40px' : '44px',
+                      background: '#B4694A',
+                      borderRadius: '55px',
+                      fontFamily: "'Poppins', sans-serif",
+                      fontStyle: 'normal',
+                      fontWeight: 500,
+                      fontSize: isExtraSmall ? '12px' : '14px',
+                      lineHeight: isExtraSmall ? '18px' : '20px',
+                      textAlign: 'center',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sign-up
+                  </button>
+                </div>
+                
+                {/* Success/Error Messages */}
+                {mounted && formState === 'success' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#059669',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: isExtraSmall ? '12px' : '14px'
+                  }}>
+                    Thank you for signing up!
+                  </p>
+                )}
+                {mounted && formState === 'error' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#DC2626',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: isExtraSmall ? '12px' : '14px'
+                  }}>
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-          
-          {/* Success/Error Messages */}
-          {mounted && formState === 'success' && (
-            <p style={{ 
-              marginTop: '8px', 
-              color: '#059669',
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: isExtraSmall ? '12px' : '14px'
-            }}>
-              Thank you for signing up!
-            </p>
-          )}
-          {mounted && formState === 'error' && (
-            <p style={{ 
-              marginTop: '8px', 
-              color: '#DC2626',
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: isExtraSmall ? '12px' : '14px'
-            }}>
-              Something went wrong. Please try again.
-            </p>
-          )}
-        </div>
+        )}
       </div>
     </section>
   );
