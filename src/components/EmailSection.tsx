@@ -231,6 +231,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           src={emailImage}
           alt="Arfve earbuds"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 488px"
           style={{
             objectFit: 'cover',
             objectPosition: isExtraSmall ? 'center top' : 'center', // Focus on top part of image for small screens
