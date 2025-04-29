@@ -10,7 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
-  const [scrolled, setScrolled] = useState(false);
+  const [inHeroSection, setInHeroSection] = useState(true);
   const [mounted, setMounted] = useState(false);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
@@ -20,12 +20,22 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
     setMounted(true);
   }, []);
 
-  // Handle scroll effect
+  // Handle scroll effect - detect which section we're in
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 50;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+      // Get content section element
+      const contentSection = document.getElementById('content');
+      
+      if (contentSection) {
+        // Get the position of the content section
+        const contentPosition = contentSection.getBoundingClientRect().top;
+        
+        // We're in hero section if content is below viewport top (with a small buffer)
+        const isInHero = contentPosition > 50;
+        
+        if (isInHero !== inHeroSection) {
+          setInHeroSection(isInHero);
+        }
       }
     };
 
@@ -34,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [scrolled]);
+  }, [inHeroSection]);
 
   // Get padding based on screen size
   const getHeaderPadding = () => {
@@ -59,9 +69,12 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
   const logoWidth = mounted ? (isExtraSmall ? 70 : isMobile ? 90 : 118.15) : 118.15;
   const logoHeight = mounted ? (isExtraSmall ? 24 : isMobile ? 32 : 41) : 41;
 
+  // Determine which logo to use based on which section we're in
+  const logoSrc = inHeroSection ? "/arfve-logo.svg" : "/arfve-logo-dark.svg";
+
   return (
     <header 
-      className={`fixed w-full flex justify-between items-center z-[4] transition-colors duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'}`}
+      className={`fixed w-full flex justify-between items-center z-[4] transition-all duration-300 ${inHeroSection ? 'bg-transparent' : 'bg-white/95 shadow-sm'}`}
       style={{
         padding: headerPadding,
         height: headerHeight,
@@ -72,15 +85,18 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
       {/* Spacer for left side to balance the layout */}
       <div className="flex-1"></div>
       
-      {/* Centered Logo */}
+      {/* Centered Logo with transition */}
       <div className="flex-1 flex justify-center items-center" style={{ zIndex: 0 }}>
-        <Image 
-          src="/arfve-logo.svg"
-          alt="Arfve"
-          width={logoWidth}
-          height={logoHeight}
-          priority
-        />
+        <div className="transition-opacity duration-300">
+          <Image 
+            src={logoSrc}
+            alt="Arfve"
+            width={logoWidth}
+            height={logoHeight}
+            priority
+            className="transition-all duration-300"
+          />
+        </div>
       </div>
       
       {/* Spacer for right side to balance the layout */}
