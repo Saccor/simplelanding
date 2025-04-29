@@ -12,6 +12,9 @@ body {
   background: rgb(var(--background-start-rgb));
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* Prevent text size adjust after orientation change on iOS */
+  width: 100%;
+  min-width: 320px; /* Set minimum width to prevent extreme squeezing */
 }
 
 .hero-section {
@@ -27,6 +30,7 @@ body {
   max-width: 1440px;
   position: relative;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .video-container::before {
@@ -42,6 +46,38 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Responsive text sizes */
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  input, button {
+    font-size: 14px !important;
+  }
+}
+
+/* Footer responsive adjustments */
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 16px 8px !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .social-icons-container {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .center-links-container {
+    width: 100% !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+  }
 }
 
 /* Text section container */

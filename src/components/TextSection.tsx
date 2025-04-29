@@ -21,6 +21,7 @@ export default function TextSection({
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const isExtraSmall = width <= breakpoints.xs;
 
   useEffect(() => {
     // Add Poppins font if not already in the document
@@ -101,6 +102,17 @@ export default function TextSection({
         fontSize: '32px',
         lineHeight: '48px'
       };
+    } else if (isExtraSmall) {
+      // iPhone SE - centered with even smaller text and narrower container
+      const centerPosition = width / 2;
+      const textWidth = width * 0.92; // Wider container for small screens (92% of viewport)
+      return {
+        width: `${textWidth}px`,
+        left: `${centerPosition - textWidth / 2}px`,
+        top: '100px', // Reduced top spacing
+        fontSize: '18px', // Smaller font size for iPhone SE
+        lineHeight: '26px' // Tighter line height
+      };
     } else {
       // Mobile - centered with smaller text
       const centerPosition = width / 2;
@@ -119,6 +131,7 @@ export default function TextSection({
 
   // Section height adjusts for mobile
   const getSectionHeight = () => {
+    if (isExtraSmall) return '340px'; // Shorter for iPhone SE
     if (isMobile) return '400px';
     if (isTablet) return '450px';
     return '522px';
@@ -153,10 +166,12 @@ export default function TextSection({
                 lineHeight: textPosition.lineHeight,
                 maxWidth: '100%',
                 height: 'auto',
-                minHeight: isMobile ? '80px' : '120px',
+                minHeight: isExtraSmall ? '50px' : isMobile ? '80px' : '120px', // Reduced min height for extra small screens
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                padding: isExtraSmall ? '0 4px' : '0',
+                wordBreak: isExtraSmall ? 'break-word' : 'normal' // Allow word breaking on very small screens
               }}
             >
               {line}
