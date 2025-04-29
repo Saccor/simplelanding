@@ -3,91 +3,80 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 interface TextSectionProps {
-  mainHeading?: string;
-  subHeading?: string;
   textLines?: string[];
 }
 
-const TextSection: React.FC<TextSectionProps> = ({ 
-  mainHeading = "WE'RE BUILDING TECHNOLOGY", 
-  subHeading,
+export default function TextSection({
   textLines = [
-    "We're building technology that's more than smart",
-    "It's intelligent, sustainable, and designed with purpose.",
-    "This isn't just a company",
-    "It's a challenge to the industry.",
-    "It's a commitment to a better way",
-    "It's a call to everyone who believes in a future where technology works for us—not against us."
+    "WE'RE BUILDING TECHNOLOGY",
+    "THAT'S MORE THAN SMART",
+    "IT'S INTELLIGENT, SUSTAINABLE, AND DESIGNED WITH PURPOSE.",
+    "THIS ISN'T JUST A COMPANY",
+    "IT'S A CHALLENGE TO THE INDUSTRY.",
+    "IT'S A COMMITMENT TO A BETTER WAY",
+    "IT'S A CALL TO EVERYONE WHO BELIEVES IN A FUTURE WHERE TECHNOLOGY WORKS FOR US—NOT AGAINST US."
   ]
-}) => {
-  // State to track if elements are ready to be observed
-  const [elementsReady, setElementsReady] = useState(false);
-  
-  // Create refs for each text line
-  const lineRefs = useRef<(HTMLParagraphElement | null)[]>([]);
+}: TextSectionProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  // Create a ref callback for each line
-  const assignRef = (index: number) => (el: HTMLParagraphElement | null) => {
-    // Store the element reference in our array at the specified index
-    lineRefs.current[index] = el;
-    
-    // Once all refs are assigned (or when the last one is assigned), mark elements as ready
-    if (index === textLines.length - 1 && el) {
-      setElementsReady(true);
-    }
-  };
-
-  // Setup effect to initialize all observers once elements are ready
   useEffect(() => {
-    if (!elementsReady) return;
-    
-    const observers: IntersectionObserver[] = [];
-    
-    // Wait a bit for the DOM to fully render
-    setTimeout(() => {
-      // Set up observers for each existing ref
-      lineRefs.current.forEach((element) => {
-        if (element) {
-          element.classList.remove('visible'); // Reset in case it was already visible
-          element.style.opacity = '0'; // Start hidden
-          element.style.transform = 'translateY(20px)'; // Start below final position
-          
-          const observer = new IntersectionObserver(
-            ([entry]) => {
-              if (entry.isIntersecting) {
-                element.classList.add('visible');
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-                observer.unobserve(element);
-              }
-            },
-            {
-              threshold: 0.2,
-              rootMargin: "0px",
-            }
-          );
-          
-          observer.observe(element);
-          observers.push(observer);
-        }
-      });
-    }, 100);
-    
-    // Cleanup function to disconnect all observers
-    return () => {
-      observers.forEach(observer => observer.disconnect());
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const containerHeight = rect.height;
+      const containerTop = rect.top;
+      const containerBottom = rect.bottom;
+      const windowHeight = window.innerHeight;
+      
+      // Calculate how far the section is scrolled through the viewport
+      const scrollPercentage = 1 - (containerBottom / windowHeight);
+      
+      // Number of possible indices (number of text lines)
+      const maxIndex = textLines.length - 1;
+      
+      // Calculate active index based on scroll percentage
+      // Only activate when the section is fully in view and being scrolled through
+      if (containerTop < windowHeight && containerBottom > 0) {
+        // Map the scroll percentage to an index
+        const calculatedIndex = Math.floor(scrollPercentage * (maxIndex + 1));
+        // Ensure the index is within bounds
+        const boundedIndex = Math.max(0, Math.min(calculatedIndex, maxIndex));
+        setActiveIndex(boundedIndex);
+      }
     };
-  }, [elementsReady]);
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    // Initial calculation
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [textLines.length]);
 
   return (
-    <section className="w-full bg-white flex justify-center">
-      <div className="text-container">
-        <div className="flex flex-col justify-center items-center h-full w-full px-4 md:px-6 py-8 md:py-0">
-          {textLines.map((line, index) => (
-            <p 
-              key={index}
-              ref={assignRef(index)}
-              className={`transition-all duration-500 delay-${index * 100} font-normal text-[18px] xs:text-[22px] sm:text-[26px] md:text-[35px] lg:text-[40px] leading-[1.3] text-center tracking-[-0.02em] text-[#192124] mb-3 sm:mb-4 md:mb-6`}
+    <section className="relative flex justify-center bg-white overflow-hidden">
+      <div 
+        ref={containerRef} 
+        className="relative w-[1440px] h-[522px] flex items-center justify-center"
+        style={{
+          maxWidth: '100%',  // For responsiveness
+        }}
+      >
+        <div className="absolute inset-0 flex flex-col justify-center items-center w-full h-full px-4 md:px-6">
+          {textLines.map((line, i) => (
+            <p
+              key={i}
+              className="text-line absolute font-normal text-[18px] xs:text-[22px] sm:text-[26px] md:text-[35px] lg:text-[40px] leading-[1.3] text-center tracking-[-0.02em] text-[#192124] transition-all duration-700"
+              style={{
+                opacity: i === activeIndex ? 1 : 0,
+                transform: i === activeIndex ? 'translateY(0)' : 
+                          i < activeIndex ? 'translateY(-40px)' : 'translateY(40px)',
+                pointerEvents: 'none'
+              }}
             >
               {line}
             </p>
@@ -96,6 +85,4 @@ const TextSection: React.FC<TextSectionProps> = ({
       </div>
     </section>
   );
-};
-
-export default TextSection; 
+} 

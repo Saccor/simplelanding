@@ -154,12 +154,13 @@ export default function SimpleLanding({
       {/* Text Section */}
       <TextSection
         textLines={[
-          "We're building technology that's more than smart",
-          "It's intelligent, sustainable, and designed with purpose.",
-          "This isn't just a company",
-          "It's a challenge to the industry.",
-          "It's a commitment to a better way",
-          "It's a call to everyone who believes in a future where technology works for us—not against us."
+          mainHeading,
+          subHeading,
+          "IT'S INTELLIGENT, SUSTAINABLE, AND DESIGNED WITH PURPOSE.",
+          "THIS ISN'T JUST A COMPANY",
+          "IT'S A CHALLENGE TO THE INDUSTRY.",
+          "IT'S A COMMITMENT TO A BETTER WAY",
+          "IT'S A CALL TO EVERYONE WHO BELIEVES IN A FUTURE WHERE TECHNOLOGY WORKS FOR US—NOT AGAINST US."
         ]}
       />
 
