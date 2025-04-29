@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import CookieConsentBanner from "@/components/CookieConsent";
+import ModalProvider from "@/components/ModalProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <ModalProvider>
+          {children}
+          <CookieConsentBanner />
+        </ModalProvider>
       </body>
     </html>
   );

@@ -4,17 +4,37 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
+import { useModal } from './ModalProvider';
+import { Cookies } from 'react-cookie-consent';
 
 const Footer: React.FC = () => {
   const { width, isMobile } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
   const [mounted, setMounted] = useState(false);
   
+  // Get modal functions from context
+  const { openPrivacyPolicy } = useModal();
+  
   // This helps avoid hydration mismatches
   useEffect(() => {
     setMounted(true);
   }, []);
   
+  // Handle privacy policy button click
+  const handlePrivacyPolicyClick = () => {
+    console.log('Privacy Policy button clicked in Footer');
+    openPrivacyPolicy();
+  };
+  
+  // Handle opening cookie settings
+  const handleCookieSettings = () => {
+    // Reset cookie consent to trigger the banner again
+    Cookies.remove('cookieConsent');
+    
+    // Reload the page to show the cookie banner
+    window.location.reload();
+  };
+
   // Use default sizes during SSR, and actual sizes on client
   const logoWidth = mounted ? (isExtraSmall ? 70 : 88) : 88;
   const logoHeight = mounted ? (isExtraSmall ? 21 : 27) : 27;
@@ -111,12 +131,18 @@ const Footer: React.FC = () => {
             color: '#192124'
           } as React.CSSProperties : defaultStyles.centerLinksContainer}
         >
-          <Link href="#" className="hover:opacity-80 transition-opacity">
+          <button 
+            onClick={handlePrivacyPolicyClick}
+            className="hover:opacity-80 transition-opacity"
+          >
             Privacy policy
-          </Link>
-          <Link href="#" className="hover:opacity-80 transition-opacity">
+          </button>
+          <button 
+            onClick={handleCookieSettings}
+            className="hover:opacity-80 transition-opacity"
+          >
             Cookie settings
-          </Link>
+          </button>
           <span>© 2025 Arfve</span>
         </div>
 
@@ -152,6 +178,8 @@ const Footer: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Privacy Policy Modal is now rendered at the root level through ModalProvider */}
     </footer>
   );
 };
