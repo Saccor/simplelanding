@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
 interface TextSectionProps {
   textLines?: string[];
@@ -19,7 +20,7 @@ export default function TextSection({
 }: TextSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440);
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
 
   useEffect(() => {
     // Add Poppins font if not already in the document
@@ -30,10 +31,6 @@ export default function TextSection({
       link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap';
       document.head.appendChild(link);
     }
-
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
 
     const handleScroll = () => {
       if (!containerRef.current) return;
@@ -62,22 +59,19 @@ export default function TextSection({
 
     // Add event listeners
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
     
     // Initial calculations
     handleScroll();
-    handleResize();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
     };
   }, [textLines.length]);
 
   // Calculate positioning based on screen size
   const getTextPosition = () => {
-    if (windowWidth >= 1440) {
-      // Exact specifications for desktop
+    if (isLargeDesktop) {
+      // Exact specifications for large desktop
       return {
         width: '618px',
         left: '411px',
@@ -85,10 +79,21 @@ export default function TextSection({
         fontSize: '40px',
         lineHeight: '60px'
       };
-    } else if (windowWidth >= 768) {
+    } else if (isDesktop) {
+      // Desktop - centered with some proportional scaling
+      const centerPosition = width / 2;
+      const textWidth = Math.min(618, width * 0.6);
+      return {
+        width: `${textWidth}px`,
+        left: `${centerPosition - textWidth / 2}px`,
+        top: '180px',
+        fontSize: '36px',
+        lineHeight: '54px'
+      };
+    } else if (isTablet) {
       // Tablet - centered with proportional sizing
-      const centerPosition = windowWidth / 2;
-      const textWidth = Math.min(618, windowWidth * 0.7);
+      const centerPosition = width / 2;
+      const textWidth = width * 0.7;
       return {
         width: `${textWidth}px`,
         left: `${centerPosition - textWidth / 2}px`,
@@ -98,25 +103,33 @@ export default function TextSection({
       };
     } else {
       // Mobile - centered with smaller text
-      const centerPosition = windowWidth / 2;
-      const textWidth = windowWidth * 0.85;
+      const centerPosition = width / 2;
+      const textWidth = width * 0.85;
       return {
         width: `${textWidth}px`,
         left: `${centerPosition - textWidth / 2}px`,
         top: '140px',
-        fontSize: '26px',
-        lineHeight: '38px'
+        fontSize: '24px',
+        lineHeight: '36px'
       };
     }
   };
 
   const textPosition = getTextPosition();
 
+  // Section height adjusts for mobile
+  const getSectionHeight = () => {
+    if (isMobile) return '400px';
+    if (isTablet) return '450px';
+    return '522px';
+  };
+
   return (
     <section className="w-full bg-white">
       <div 
         ref={containerRef} 
-        className="w-full mx-auto h-[522px] flex items-center justify-center max-w-[1440px] relative"
+        className="w-full mx-auto flex items-center justify-center max-w-[1440px] relative"
+        style={{ height: getSectionHeight() }}
       >
         {textLines.map((line, i) => (
           <div
@@ -140,7 +153,7 @@ export default function TextSection({
                 lineHeight: textPosition.lineHeight,
                 maxWidth: '100%',
                 height: 'auto',
-                minHeight: '120px',
+                minHeight: isMobile ? '80px' : '120px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'

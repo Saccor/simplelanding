@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import useScrollObserver from '../hooks/useScrollObserver';
+import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
 interface EmailSectionProps {
   emailHeading: string;
@@ -19,7 +20,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440);
+  const { width, isMobile, isTablet } = useWindowSize();
   
   // Refs for scroll animations
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -27,9 +28,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Add Poppins font and handle responsive sizing
+  // Add Poppins font
   useEffect(() => {
-    // Add Poppins font
     if (!document.getElementById('poppins-font')) {
       const link = document.createElement('link');
       link.id = 'poppins-font';
@@ -37,17 +37,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap';
       document.head.appendChild(link);
     }
-
-    // Handle resize
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
   }, []);
   
   // Use scroll observers
@@ -77,9 +66,9 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     }
   };
 
-  // Get right content position based on screen size
+  // Get right content style based on screen size
   const getRightContentStyle = () => {
-    if (windowWidth < 768) {
+    if (isMobile) {
       return {
         position: 'absolute' as const,
         width: '90%',
@@ -94,8 +83,24 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         padding: '0px',
         gap: '42px',
       };
+    } else if (isTablet) {
+      return {
+        position: 'absolute' as const,
+        width: '80%',
+        maxWidth: '607px',
+        height: 'auto',
+        left: '50%',
+        top: '150px',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        flexDirection: 'column' as const,
+        alignItems: 'flex-start' as const,
+        padding: '0px',
+        gap: '32px',
+      };
     }
     
+    // Desktop default
     return {
       position: 'absolute' as const,
       width: '607px',
@@ -112,28 +117,98 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     };
   };
 
-  const rightContentStyle = getRightContentStyle();
-
-  return (
-    <section style={{
-      width: '1440px',
+  // Get image container style based on screen size
+  const getImageStyle = () => {
+    if (isMobile) {
+      return {
+        position: 'absolute' as const,
+        width: '100%',
+        height: '300px',
+        left: '0px',
+        top: '0px',
+      };
+    }
+    
+    // Tablet and Desktop default
+    return {
+      position: 'absolute' as const,
+      width: '488px',
       height: '650px',
+      left: '0px',
+      top: '0px',
+      maxWidth: isTablet ? '40%' : '50%'
+    };
+  };
+
+  // Get section container dimensions based on screen size
+  const getSectionStyle = () => {
+    const baseStyle = {
+      width: '1440px',
+      height: isMobile ? '800px' : '650px',
       background: '#F3F3F3',
-      position: 'relative',
+      position: 'relative' as const,
       flexGrow: 0,
       zIndex: 2,
       maxWidth: '100%',
       margin: '0 auto'
-    }}>
+    };
+    
+    return baseStyle;
+  };
+
+  // Get form element styles based on screen size
+  const getFormStyle = () => {
+    const baseWidth = isMobile ? width * 0.8 : 421.79;
+    const fontSize = isMobile ? 16 : 18;
+    const lineHeight = isMobile ? 24 : 28;
+    const gap = isMobile ? 20 : 30;
+    
+    return {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      alignItems: 'flex-start' as const,
+      padding: '20px 0px',
+      gap: `${gap}px`,
+      width: `${baseWidth}px`,
+      height: 'auto',
+      filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+      borderRadius: '20px',
+      maxWidth: '100%',
+      fontSize: `${fontSize}px`,
+      lineHeight: `${lineHeight}px`,
+    };
+  };
+
+  // Get font size based on screen size
+  const getHeadingStyle = () => {
+    const fontSize = isMobile ? 24 : isTablet ? 28 : 30;
+    const lineHeight = isMobile ? 32 : isTablet ? 36 : 38;
+    
+    return {
+      width: '100%',
+      height: 'auto',
+      fontFamily: "'Poppins', sans-serif",
+      fontStyle: 'normal' as const,
+      fontWeight: 600,
+      fontSize: `${fontSize}px`,
+      lineHeight: `${lineHeight}px`,
+      color: '#192124',
+      margin: 0,
+      maxWidth: '100%'
+    };
+  };
+
+  // Calculate styles
+  const sectionStyle = getSectionStyle();
+  const imageStyle = getImageStyle();
+  const rightContentStyle = getRightContentStyle();
+  const formStyle = getFormStyle();
+  const headingStyle = getHeadingStyle();
+
+  return (
+    <section style={sectionStyle}>
       {/* Left side - Image */}
-      <div style={{
-        position: 'absolute',
-        width: '488px',
-        height: '650px',
-        left: '0px',
-        top: '0px',
-        maxWidth: windowWidth < 768 ? '100%' : '50%'
-      }}>
+      <div style={imageStyle}>
         <Image
           src={emailImage}
           alt="Arfve earbuds"
@@ -157,25 +232,14 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           alignItems: 'flex-start',
           padding: '0px',
           gap: '28px',
-          width: '607px',
-          height: '142px',
-          maxWidth: '100%'
+          width: '100%',
+          maxWidth: '607px',
+          height: 'auto'
         }}>
           <h2 
             ref={headingRef}
             className="scroll-reveal"
-            style={{ 
-              width: '607px',
-              height: '76px',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 600,
-              fontSize: '30px',
-              lineHeight: '38px',
-              color: '#192124',
-              margin: 0,
-              maxWidth: '100%'
-            }}
+            style={headingStyle}
           >
             {emailHeading}
           </h2>
@@ -183,18 +247,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           <p 
             ref={subtextRef}
             className="scroll-reveal delay-200"
-            style={{ 
-              width: '607px',
-              height: '38px',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 600,
-              fontSize: '30px',
-              lineHeight: '38px',
-              color: '#192124',
-              margin: 0,
-              maxWidth: '100%'
-            }}
+            style={headingStyle}
           >
             {emailSubtext}
           </p>
@@ -204,29 +257,18 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         <div
           ref={formRef}
           className="scroll-reveal delay-300"
-          style={{ 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            padding: '20px 0px',
-            gap: '30px',
-            width: '421.79px',
-            height: 'auto',
-            filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-            borderRadius: '20px',
-            maxWidth: '100%'
-          }}
+          style={formStyle}
         >
           <p 
             ref={descriptionRef}
             style={{ 
-              width: '421.79px',
-              height: '56px',
+              width: '100%',
+              height: 'auto',
               fontFamily: "'Poppins', sans-serif",
               fontStyle: 'normal',
               fontWeight: 400,
-              fontSize: '18px',
-              lineHeight: '28px',
+              fontSize: isMobile ? '16px' : '18px',
+              lineHeight: isMobile ? '24px' : '28px',
               color: '#192124',
               margin: 0,
               maxWidth: '100%'
@@ -242,7 +284,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               alignItems: 'center',
               padding: '0px',
               gap: '12px',
-              width: '421.79px',
+              width: '100%',
               height: '44px',
               maxWidth: '100%'
             }}
@@ -259,7 +301,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 alignItems: 'center',
                 padding: '10px 20px',
                 gap: '10px',
-                width: '311.79px',
                 height: '44px',
                 background: '#FFFFFF',
                 border: '1px solid rgba(0, 0, 0, 0.48)',

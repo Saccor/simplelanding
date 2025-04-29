@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
 interface HeaderProps {
   isMuted: boolean;
@@ -10,7 +11,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440);
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
 
   // Handle scroll effect
   useEffect(() => {
@@ -21,43 +22,59 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
       }
     };
 
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
     };
   }, [scrolled]);
 
-  // Calculate sound button position based on screen width
+  // Calculate sound button position based on screen size
   const getSoundButtonPosition = () => {
     const basePosition = 1306;
-    if (windowWidth < 1440) {
-      // Calculate right position as percentage of screen width
-      const rightPercentage = ((1440 - basePosition) / 1440) * 100;
+    
+    if (isLargeDesktop) {
+      return {
+        left: `${basePosition}px`,
+        right: 'auto'
+      };
+    } else if (isDesktop) {
+      // Position from right for large screens
       return {
         left: 'auto',
-        right: `${rightPercentage}%`
+        right: '50px'
+      };
+    } else if (isTablet) {
+      // Position from right for tablets
+      return {
+        left: 'auto',
+        right: '32px'
+      };
+    } else {
+      // Mobile positioning
+      return {
+        left: 'auto',
+        right: '16px'
       };
     }
-    return {
-      left: `${basePosition}px`,
-      right: 'auto'
-    };
+  };
+
+  // Get padding based on screen size
+  const getHeaderPadding = () => {
+    if (isMobile) return '32px 16px';
+    if (isTablet) return '40px 32px';
+    if (isDesktop) return '56px 64px';
+    return '64px 124px'; // Large desktop
   };
 
   const soundButtonPosition = getSoundButtonPosition();
+  const headerPadding = getHeaderPadding();
 
   return (
     <header 
       className={`fixed w-full flex justify-center items-center z-[4] transition-colors duration-300 ${scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'}`}
       style={{
-        padding: windowWidth < 768 ? '32px 24px' : '64px 124px',
+        padding: headerPadding,
         height: '87px',
         left: '0px',
         top: '0px',
@@ -72,8 +89,8 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
         <Image 
           src="/arfve-logo.svg"
           alt="Arfve"
-          width={118.15}
-          height={41}
+          width={isMobile ? 90 : 118.15}
+          height={isMobile ? 32 : 41}
           priority
         />
       </div>
