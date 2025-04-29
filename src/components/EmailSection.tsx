@@ -227,6 +227,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                     transition: 'opacity 0.5s ease'
                   }}
                   onLoad={() => setImageLoading(false)}
+                  loading="eager"
                   priority
                   quality={90}
                 />
@@ -449,6 +450,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                     transition: 'opacity 0.5s ease'
                   }}
                   onLoad={() => setImageLoading(false)}
+                  loading="eager"
                   priority
                   quality={90}
                 />
