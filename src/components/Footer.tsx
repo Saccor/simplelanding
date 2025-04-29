@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
 const Footer: React.FC = () => {
-  const { width } = useWindowSize();
+  const { width, isMobile } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
   const [mounted, setMounted] = useState(false);
   
@@ -17,19 +19,72 @@ const Footer: React.FC = () => {
   const logoWidth = mounted ? (isExtraSmall ? 70 : 88) : 88;
   const logoHeight = mounted ? (isExtraSmall ? 21 : 27) : 27;
   const iconSize = mounted ? (isExtraSmall ? "16" : "18") : "18";
-  const containerClass = mounted 
-    ? `w-full max-w-[1440px] ${isExtraSmall ? 'px-2 py-4' : 'px-4 sm:px-6 md:px-8 lg:px-24 py-6 md:py-8'} flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6`
-    : "w-full max-w-[1440px] px-4 sm:px-6 md:px-8 lg:px-24 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6";
-  
-  const linksClass = mounted
-    ? `flex flex-wrap justify-center items-center gap-2 md:gap-6 ${isExtraSmall ? 'text-xs' : 'text-sm md:text-base'}`
-    : "flex flex-wrap justify-center items-center gap-2 md:gap-6 text-sm md:text-base";
-  
+
+  // Server-side default styles
+  const defaultStyles = {
+    footerContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '32px 124px 24px',
+      gap: '32px',
+      width: '100%',
+      maxWidth: '1440px',
+      height: 'auto',
+      minHeight: '97px',
+      background: '#FFFFFF',
+      zIndex: 3
+    } as React.CSSProperties,
+    socialIconsContainer: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: '0px',
+      gap: '18px',
+      height: '30px',
+      justifyContent: 'flex-end',
+      flex: 1
+    } as React.CSSProperties,
+    centerLinksContainer: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: '0px',
+      gap: '12px',
+      height: '24px',
+      justifyContent: 'center',
+      flex: 2,
+      fontSize: '14px',
+      color: '#192124'
+    } as React.CSSProperties
+  };
+
   return (
     <footer className="w-full bg-white flex justify-center">
-      <div className={containerClass}>
-        {/* Logo */}
-        <div className="w-[100px] md:w-[130px] flex justify-center md:justify-start">
+      <div 
+        className="footer-container"
+        style={mounted ? {
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'center',
+          justifyContent: isMobile ? 'center' : 'space-between',
+          padding: isMobile 
+            ? isExtraSmall ? '16px 8px' : '20px 24px' 
+            : '32px 124px 24px',
+          gap: isMobile ? '12px' : '32px',
+          width: '100%',
+          maxWidth: '1440px',
+          height: 'auto',
+          minHeight: isMobile ? 'auto' : '97px',
+          background: '#FFFFFF',
+          zIndex: 3
+        } as React.CSSProperties : defaultStyles.footerContainer}
+      >
+        {/* Logo (left section) */}
+        <div 
+          className="flex items-center justify-center"
+          style={mounted && isMobile ? { width: '100%' } : {}}
+        >
           <Image 
             src="/arfve-logo-dark.svg"
             alt="Arfve"
@@ -40,7 +95,22 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Center links */}
-        <div className={linksClass}>
+        <div 
+          className="center-links-container"
+          style={mounted ? {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: '0px',
+            gap: isMobile ? (isExtraSmall ? '8px' : '10px') : '12px',
+            height: '24px',
+            justifyContent: 'center',
+            flex: isMobile ? 'none' : 2,
+            width: isMobile ? '100%' : 'auto',
+            fontSize: isExtraSmall ? '12px' : '14px',
+            color: '#192124'
+          } as React.CSSProperties : defaultStyles.centerLinksContainer}
+        >
           <Link href="#" className="hover:opacity-80 transition-opacity">
             Privacy policy
           </Link>
@@ -50,8 +120,21 @@ const Footer: React.FC = () => {
           <span>© 2025 Arfve</span>
         </div>
 
-        {/* Social Media Icons */}
-        <div className="flex items-center gap-3 md:gap-6">
+        {/* Social Media Icons (right section) */}
+        <div 
+          className="social-icons-container"
+          style={mounted ? {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: '0px',
+            gap: isExtraSmall ? '15px' : '18px',
+            height: '30px',
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            flex: isMobile ? 'none' : 1,
+            width: isMobile ? '100%' : 'auto'
+          } as React.CSSProperties : defaultStyles.socialIconsContainer}
+        >
           <Link href="#" aria-label="YouTube" className="hover:opacity-80 transition-opacity">
             <svg className="youtube-icon" xmlns="http://www.w3.org/2000/svg" width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
