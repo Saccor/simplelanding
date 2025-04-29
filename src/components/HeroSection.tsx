@@ -201,8 +201,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             Scroll Down
           </span>
           <div className="animate-bounce">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
+            <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 1.81059L36 21.0569L70 1.8106" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
         </button>

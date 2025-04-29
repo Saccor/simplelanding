@@ -286,6 +286,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           }}
           onLoad={() => setImageLoading(false)}
           priority
+          quality={85}
+          loading="eager"
         />
       </div>
       
