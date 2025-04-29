@@ -35,7 +35,7 @@ const Footer: React.FC = () => {
             alt="Arfve"
             width={logoWidth}
             height={logoHeight}
-            style={{ objectFit: 'contain', height: 'auto' }}
+            style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
           />
         </div>
 

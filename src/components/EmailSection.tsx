@@ -194,6 +194,18 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     color: '#FFFFFF',
     cursor: 'pointer'
   };
+  
+  // Form row container style - extracted to avoid inline style issues
+  const defaultFormRowStyle = {
+    display: 'flex',
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+    padding: '0px',
+    gap: '8px',
+    width: '100%', 
+    height: '44px',
+    maxWidth: '100%'
+  };
 
   // Only update styles if mounted to avoid hydration mismatches
   const sectionStyle = mounted ? {
@@ -251,6 +263,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     fontSize: (isExtraSmall ? '12px' : '14px'),
     lineHeight: (isExtraSmall ? '18px' : '20px'),
   } : defaultButtonStyle;
+  
+  const formRowStyle = mounted ? {
+    ...defaultFormRowStyle,
+    height: isExtraSmall ? '40px' : '44px',
+  } : defaultFormRowStyle;
 
   return (
     <section style={sectionStyle}>
@@ -315,24 +332,16 @@ const EmailSection: React.FC<EmailSectionProps> = ({
             Sign up with your email address, pay €1 to get our best opening offer
           </p>
           
-          <div 
-            style={{ 
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: '0px',
-              gap: '8px',
-              width: '100%',
-              height: isExtraSmall ? '40px' : '44px',
-              maxWidth: '100%'
-            }}
-          >
+          <div style={formRowStyle}>
             <input
               type="email"
+              id="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email"
               style={inputStyle}
+              autoComplete="email"
             />
             <button
               onClick={handleSubmit}

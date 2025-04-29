@@ -95,6 +95,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
             height={logoHeight}
             priority
             className="transition-all duration-300"
+            style={{ width: 'auto', height: 'auto' }}
           />
         </div>
       </div>
