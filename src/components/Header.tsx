@@ -86,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
           height: '40px',
           ...soundButtonPosition,
           top: '24px',
-          background: 'rgba(255, 255, 255, 0.1)',
+          background: '#333333',
           borderRadius: '4px',
           display: 'flex',
           flexDirection: 'column',
@@ -104,24 +104,21 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
           className="flex items-center justify-center w-full h-full"
         >
           <span className="sr-only">{isMuted ? "Unmute" : "Mute"}</span>
-          <svg 
-            width="20" 
-            height="16" 
-            viewBox="0 0 20 16" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ border: '2px solid #FFFFFF' }}
-          >
-            {isMuted ? (
-              <path d="M1 10V6C1 5.44772 1.44772 5 2 5H5L9 1V15L5 11H2C1.44772 11 1 10.5523 1 10Z" stroke="white" strokeWidth="2" />
-            ) : (
-              <>
-                <path d="M1 10V6C1 5.44772 1.44772 5 2 5H5L9 1V15L5 11H2C1.44772 11 1 10.5523 1 10Z" stroke="white" strokeWidth="2" />
-                <path d="M16 8C16 6.4087 15.3679 4.88258 14.2426 3.75736C13.1174 2.63214 11.5913 2 10 2" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M14 10C14 9.20435 13.6839 8.44129 13.1213 7.87868C12.5587 7.31607 11.7956 7 11 7" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-              </>
-            )}
-          </svg>
+          {isMuted ? (
+            // Muted version
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
+              <line x1="23" y1="9" x2="17" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="17" y1="9" x2="23" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            // Unmuted version
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
+              <path d="M15.54 8.46C16.1528 9.07286 16.496 9.91307 16.496 10.79C16.496 11.6669 16.1528 12.5071 15.54 13.12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M19.07 4.93C20.9447 6.80528 21.9979 9.34836 21.9979 12C21.9979 14.6516 20.9447 17.1947 19.07 19.07" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
         </button>
       </div>
     </header>
