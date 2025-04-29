@@ -131,45 +131,8 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
         />
       </div>
       
-      {/* Sound Button Container (Right Side) */}
-      <div className="flex-1 flex justify-end">
-        <div 
-          style={{ 
-            width: buttonSize.width,
-            height: buttonSize.height,
-            background: '#333333',
-            borderRadius: '4px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: mounted && isExtraSmall ? '2px 1px' : '4px 2px',
-            zIndex: 1
-          }}
-        >
-          <button 
-            onClick={onToggleMute}
-            aria-label={isMuted ? "Unmute" : "Mute"}
-            className="flex items-center justify-center w-full h-full"
-          >
-            <span className="sr-only">{isMuted ? "Unmute" : "Mute"}</span>
-            {isMuted ? (
-              // Muted version
-              <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
-                <line x1="23" y1="9" x2="17" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="17" y1="9" x2="23" y2="15" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            ) : (
-              // Unmuted version
-              <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="white"/>
-                <path d="M15.54 8.46C16.1528 9.07286 16.496 9.91307 16.496 10.79C16.496 11.6669 16.1528 12.5071 15.54 13.12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M19.07 4.93C20.9447 6.80528 21.9979 9.34836 21.9979 12C21.9979 14.6516 20.9447 17.1947 19.07 19.07" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
+      {/* Empty div for right side to maintain layout */}
+      <div className="flex-1"></div>
     </header>
   );
 };

@@ -38,3 +38,6 @@ next-env.d.ts
 # Large media files
 public/HeroVideo\ 1.mp4
 public/HeroVideo1.mp4
+public/videos/Hero\ v2.mp4
+# All large video files
+public/videos/*.mp4

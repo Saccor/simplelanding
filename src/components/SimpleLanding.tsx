@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
+import HeroSection from './HeroSection';
 import TextSection from './TextSection';
 import EmailSection from './EmailSection';
 import Footer from './Footer';
@@ -28,7 +28,7 @@ interface SimpleLandingProps {
 }
 
 export default function SimpleLanding({
-  videoUrl = "/HeroVideo1.mp4",
+  videoUrl = "/videos/Hero v2.mp4",
   mobileVideoUrl,
   mainHeading = "WE'RE BUILDING TECHNOLOGY",
   subHeading = "THAT'S MORE THAN SMART",
@@ -40,8 +40,6 @@ export default function SimpleLanding({
 }: SimpleLandingProps) {
   // Hero Section State
   const [isMuted, setIsMuted] = useState(initialMuted);
-  const [isVideoLoading, setIsVideoLoading] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Initialize scroll observer
   useEffect(() => {
@@ -52,47 +50,16 @@ export default function SimpleLanding({
   // Debug logging
   useEffect(() => {
     console.log("SimpleLanding props:", {
+      videoUrl,
       emailHeading,
       emailSubtext,
       emailImage
     });
-  }, [emailHeading, emailSubtext, emailImage]);
+  }, [videoUrl, emailHeading, emailSubtext, emailImage]);
 
-  // Hero Section Effects
+  // Update muted state when initialMuted prop changes
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleLoadedData = () => {
-      console.log('Video loaded successfully!');
-      setIsVideoLoading(false);
-      video.play().catch(error => {
-        console.error('Video autoplay failed:', error);
-        setIsVideoLoading(false);
-      });
-    };
-
-    const handleError = (event: Event) => {
-      console.error('Video error:', event);
-      setIsVideoLoading(false);
-    };
-
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('error', handleError as EventListener);
-    video.load();
-
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('error', handleError as EventListener);
-    };
-  }, []);
-
-  // Update video muted state when initialMuted prop changes
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = initialMuted;
-      setIsMuted(initialMuted);
-    }
+    setIsMuted(initialMuted);
   }, [initialMuted]);
 
   // Hero Section Handlers
@@ -114,56 +81,12 @@ export default function SimpleLanding({
       />
       
       {/* Hero Section */}
-      <section className="w-full bg-black flex justify-center items-center">
-        <div className="video-container">
-          <video
-            ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            playsInline
-            muted={isMuted}
-            loop
-            autoPlay
-            preload="auto"
-          >
-            <source 
-              src={videoUrl} 
-              type="video/mp4" 
-            />
-            {mobileVideoUrl && (
-              <source 
-                src={mobileVideoUrl} 
-                type="video/mp4" 
-                media="(max-width: 768px)"
-              />
-            )}
-            Your browser does not support the video tag.
-          </video>
-          
-          {/* Loading Spinner */}
-          {isVideoLoading && (
-            <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-            </div>
-          )}
-
-          {/* Overlay for better visibility */}
-          <div className="absolute inset-0 bg-black/30 z-[1]"></div>
-          
-          {/* Center text if needed */}
-          <div className="absolute z-[2] w-full h-full flex items-center justify-center">
-            <div className="text-white text-center">
-              {/* Add centered content here if needed */}
-            </div>
-          </div>
-          
-          {/* Down Arrow */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[2] animate-bounce">
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-        </div>
-      </section>
+      <HeroSection
+        videoUrl={videoUrl}
+        mobileVideoUrl={mobileVideoUrl}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
+      />
 
       {/* Text Section */}
       <TextSection

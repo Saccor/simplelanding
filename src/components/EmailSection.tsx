@@ -75,152 +75,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   // Check if device is extra small (iPhone SE size)
   const isExtraSmall = width <= breakpoints.xs;
 
-  // Get right content style based on screen size
-  const getRightContentStyle = () => {
-    if (isExtraSmall) {
-      // Extra small screens like iPhone SE need specialized layout
-      return {
-        position: 'relative' as const,
-        width: '94%', 
-        maxWidth: '607px',
-        height: 'auto',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'flex-start' as const,
-        padding: '0px',
-        gap: '16px', // Reduced gap for small screens
-      };
-    } else if (isMobile) {
-      return {
-        position: 'relative' as const,
-        width: '90%',
-        maxWidth: '607px',
-        height: 'auto',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'flex-start' as const,
-        padding: '0px',
-        gap: '24px',
-      };
-    } else if (isTablet) {
-      return {
-        position: 'relative' as const,
-        width: '80%',
-        maxWidth: '607px',
-        height: 'auto',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'flex-start' as const,
-        padding: '0px',
-        gap: '32px',
-      };
-    }
-    
-    // Desktop default
-    return {
-      position: 'relative' as const,
-      width: '607px',
-      height: 'auto',
-      display: 'flex',
-      flexDirection: 'column' as const,
-      alignItems: 'flex-start' as const,
-      padding: '0px',
-      gap: '42px',
-      maxWidth: 'calc(100% - 30px)',
-    };
-  };
-
-  // Get image container style based on screen size
-  const getImageStyle = () => {
-    if (isExtraSmall) {
-      return {
-        position: 'relative' as const,
-        width: '100%',
-        height: '340px',
-        overflow: 'hidden' as const,
-      };
-    } else if (isMobile) {
-      return {
-        position: 'relative' as const,
-        width: '100%',
-        height: '300px',
-        overflow: 'hidden' as const,
-      };
-    }
-    
-    // Tablet and Desktop default
-    return {
-      position: 'relative' as const,
-      width: '100%',
-      height: '650px',
-      overflow: 'hidden' as const,
-    };
-  };
-
-  // Get section container dimensions based on screen size
-  const getSectionStyle = () => {
-    return {
-      width: '100%',
-      maxWidth: '1440px',
-      background: '#F3F3F3',
-      position: 'relative' as const,
-      flexGrow: 0,
-      zIndex: 2,
-      margin: '0 auto',
-      overflow: 'hidden' as const,
-      display: 'flex' as const,
-      flexDirection: isMobile || isExtraSmall ? 'column' as const : 'row' as const,
-    };
-  };
-
-  // Get form element styles based on screen size
-  const getFormStyle = () => {
-    // Use percentage-based width calculation instead of fixed pixels
-    const width = isExtraSmall ? '100%' : isMobile ? '100%' : '421.79px';
-    const fontSize = isExtraSmall ? 14 : isMobile ? 16 : 18;
-    const lineHeight = isExtraSmall ? 20 : isMobile ? 24 : 28;
-    const gap = isExtraSmall ? 12 : isMobile ? 16 : 30;
-    
-    return {
-      display: 'flex',
-      flexDirection: 'column' as const,
-      alignItems: 'flex-start' as const,
-      padding: '12px 0px',
-      gap: `${gap}px`,
-      width,
-      height: 'auto',
-      filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-      borderRadius: '20px',
-      maxWidth: '100%',
-      fontSize: `${fontSize}px`,
-      lineHeight: `${lineHeight}px`,
-    };
-  };
-
-  // Get font size based on screen size
-  const getHeadingStyle = () => {
-    const fontSize = isExtraSmall ? 20 : isMobile ? 24 : isTablet ? 28 : 30;
-    const lineHeight = isExtraSmall ? 28 : isMobile ? 32 : isTablet ? 36 : 38;
-    
-    return {
-      width: '100%',
-      height: 'auto',
-      fontFamily: "'Poppins', sans-serif",
-      fontStyle: 'normal' as const,
-      fontWeight: 600,
-      fontSize: `${fontSize}px`,
-      lineHeight: `${lineHeight}px`,
-      color: '#192124',
-      margin: 0,
-      maxWidth: '100%'
-    };
-  };
-
-  // Calculate styles - only if mounted to avoid hydration mismatch
-  const sectionStyle = mounted ? getSectionStyle() : {
+  // Initial styles for server-side rendering to avoid hydration mismatches
+  const defaultSectionStyle = {
     width: '100%',
     maxWidth: '1440px',
     background: '#F3F3F3',
@@ -233,26 +89,28 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     flexDirection: 'row' as const,
   };
   
-  const imageStyle = mounted ? getImageStyle() : {
+  const defaultImageStyle = {
     position: 'relative' as const,
     width: '100%',
     height: '650px',
     overflow: 'hidden' as const,
+    flex: '0 0 40%',
   };
   
-  const rightContentStyle = mounted ? getRightContentStyle() : {
+  const defaultRightContentStyle = {
     position: 'relative' as const,
     width: '607px',
     height: 'auto',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'flex-start' as const,
-    padding: '0px',
+    padding: '135.5px 40px 40px 40px',
     gap: '42px',
     maxWidth: 'calc(100% - 30px)',
+    flex: '0 0 60%',
   };
   
-  const formStyle = mounted ? getFormStyle() : {
+  const defaultFormStyle = {
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'flex-start' as const,
@@ -267,7 +125,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     lineHeight: '28px',
   };
   
-  const headingStyle = mounted ? getHeadingStyle() : {
+  const defaultHeadingStyle = {
     width: '100%',
     height: 'auto',
     fontFamily: "'Poppins', sans-serif",
@@ -280,13 +138,124 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     maxWidth: '100%'
   };
 
+  const defaultDescriptionStyle = {
+    width: '100%',
+    height: 'auto',
+    fontFamily: "'Poppins', sans-serif",
+    fontStyle: 'normal',
+    fontWeight: 400,
+    fontSize: '18px',
+    lineHeight: '28px',
+    color: '#192124',
+    margin: 0,
+    maxWidth: '100%'
+  };
+
+  const defaultInputStyle = {
+    boxSizing: 'border-box' as const,
+    display: 'flex',
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+    padding: '10px 20px',
+    gap: '10px',
+    height: '44px',
+    background: '#FFFFFF',
+    border: '1px solid rgba(0, 0, 0, 0.48)',
+    borderRadius: '28px',
+    fontFamily: "'Poppins', sans-serif",
+    fontStyle: 'normal',
+    fontWeight: 400,
+    fontSize: '14px',
+    lineHeight: '20px',
+    textAlign: 'center' as const,
+    color: '#000000',
+    flexGrow: 1,
+    maxWidth: 'calc(100% - 98px)'
+  };
+
+  const defaultButtonStyle = {
+    display: 'flex',
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 20px',
+    gap: '10px',
+    width: '98px',
+    height: '44px',
+    background: '#B4694A',
+    borderRadius: '55px',
+    border: 'none',
+    fontFamily: "'Poppins', sans-serif",
+    fontStyle: 'normal',
+    fontWeight: 500,
+    fontSize: '14px',
+    lineHeight: '20px',
+    textAlign: 'center' as const,
+    color: '#FFFFFF',
+    cursor: 'pointer'
+  };
+
+  // Only update styles if mounted to avoid hydration mismatches
+  const sectionStyle = mounted ? {
+    ...defaultSectionStyle,
+    flexDirection: (isMobile || isExtraSmall) ? 'column' as const : 'row' as const,
+  } : defaultSectionStyle;
+  
+  const imageStyle = mounted ? {
+    ...defaultImageStyle,
+    height: (isExtraSmall ? '340px' : isMobile ? '300px' : '650px'),
+    flex: (isMobile || isExtraSmall) ? 'none' : '0 0 40%'
+  } : defaultImageStyle;
+  
+  const rightContentStyle = mounted ? {
+    ...defaultRightContentStyle,
+    width: (isExtraSmall ? '94%' : isMobile ? '90%' : isTablet ? '80%' : '607px'),
+    gap: (isExtraSmall ? '16px' : isMobile ? '24px' : isTablet ? '32px' : '42px'),
+    padding: (isMobile || isExtraSmall) ? '20px 16px' : '135.5px 40px 40px 40px',
+    flex: (isMobile || isExtraSmall) ? 'none' : '0 0 60%',
+  } : defaultRightContentStyle;
+  
+  const formStyle = mounted ? {
+    ...defaultFormStyle,
+    gap: (isExtraSmall ? '12px' : isMobile ? '16px' : '30px'),
+    width: (isExtraSmall ? '100%' : isMobile ? '100%' : '421.79px'),
+    fontSize: (isExtraSmall ? '14px' : isMobile ? '16px' : '18px'),
+    lineHeight: (isExtraSmall ? '20px' : isMobile ? '24px' : '28px'),
+  } : defaultFormStyle;
+  
+  const headingStyle = mounted ? {
+    ...defaultHeadingStyle,
+    fontSize: (isExtraSmall ? '20px' : isMobile ? '24px' : isTablet ? '28px' : '30px'),
+    lineHeight: (isExtraSmall ? '28px' : isMobile ? '32px' : isTablet ? '36px' : '38px'),
+  } : defaultHeadingStyle;
+
+  const descriptionStyle = mounted ? {
+    ...defaultDescriptionStyle,
+    fontSize: (isExtraSmall ? '14px' : isMobile ? '16px' : '18px'),
+    lineHeight: (isExtraSmall ? '20px' : isMobile ? '24px' : '28px'),
+  } : defaultDescriptionStyle;
+
+  const inputStyle = mounted ? {
+    ...defaultInputStyle,
+    padding: (isExtraSmall ? '8px 16px' : '10px 20px'),
+    height: (isExtraSmall ? '40px' : '44px'),
+    fontSize: (isExtraSmall ? '12px' : '14px'),
+    lineHeight: (isExtraSmall ? '18px' : '20px'),
+  } : defaultInputStyle;
+
+  const buttonStyle = mounted ? {
+    ...defaultButtonStyle,
+    padding: (isExtraSmall ? '8px 16px' : '10px 20px'),
+    width: (isExtraSmall ? '90px' : '98px'),
+    height: (isExtraSmall ? '40px' : '44px'),
+    fontSize: (isExtraSmall ? '12px' : '14px'),
+    lineHeight: (isExtraSmall ? '18px' : '20px'),
+  } : defaultButtonStyle;
+
   return (
     <section style={sectionStyle}>
       {/* Left side - Image */}
-      <div style={{
-        ...imageStyle,
-        flex: mounted && (isMobile || isExtraSmall) ? 'none' : '0 0 40%'
-      }}>
+      <div style={imageStyle}>
         <Image
           src={emailImage}
           alt="Arfve earbuds"
@@ -304,11 +273,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       </div>
       
       {/* Right side - Content */}
-      <div style={{
-        ...rightContentStyle,
-        flex: mounted && (isMobile || isExtraSmall) ? 'none' : '0 0 60%',
-        padding: mounted && (isMobile || isExtraSmall) ? '20px 16px' : '135.5px 40px 40px 40px',
-      }}>
+      <div style={rightContentStyle}>
         {/* Heading section */}
         <div style={{
           display: 'flex',
@@ -345,18 +310,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         >
           <p 
             ref={descriptionRef}
-            style={{ 
-              width: '100%',
-              height: 'auto',
-              fontFamily: "'Poppins', sans-serif",
-              fontStyle: 'normal',
-              fontWeight: 400,
-              fontSize: isExtraSmall ? '14px' : isMobile ? '16px' : '18px',
-              lineHeight: isExtraSmall ? '20px' : isMobile ? '24px' : '28px',
-              color: '#192124',
-              margin: 0,
-              maxWidth: '100%'
-            }}
+            style={descriptionStyle}
           >
             Sign up with your email address, pay €1 to get our best opening offer
           </p>
@@ -378,52 +332,12 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email"
-              style={{ 
-                boxSizing: 'border-box',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                gap: '10px',
-                height: isExtraSmall ? '40px' : '44px',
-                background: '#FFFFFF',
-                border: '1px solid rgba(0, 0, 0, 0.48)',
-                borderRadius: '28px',
-                fontFamily: "'Poppins', sans-serif",
-                fontStyle: 'normal',
-                fontWeight: 400,
-                fontSize: isExtraSmall ? '12px' : '14px',
-                lineHeight: isExtraSmall ? '18px' : '20px',
-                textAlign: 'center',
-                color: '#000000',
-                flexGrow: 1,
-                maxWidth: 'calc(100% - 98px)'
-              }}
+              style={inputStyle}
             />
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              style={{ 
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                gap: '10px',
-                width: isExtraSmall ? '90px' : '98px',
-                height: isExtraSmall ? '40px' : '44px',
-                background: '#B4694A',
-                borderRadius: '55px',
-                border: 'none',
-                fontFamily: "'Poppins', sans-serif",
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: isExtraSmall ? '12px' : '14px',
-                lineHeight: isExtraSmall ? '18px' : '20px',
-                textAlign: 'center',
-                color: '#FFFFFF',
-                cursor: 'pointer'
-              }}
+              style={buttonStyle}
             >
               Sign-up
             </button>
