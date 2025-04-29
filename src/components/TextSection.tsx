@@ -75,52 +75,38 @@ export default function TextSection({
       // Exact specifications for large desktop
       return {
         width: '618px',
-        left: '411px',
-        top: '201px',
         fontSize: '40px',
         lineHeight: '60px'
       };
     } else if (isDesktop) {
-      // Desktop - centered with some proportional scaling
-      const centerPosition = width / 2;
+      // Desktop - proportional scaling
       const textWidth = Math.min(618, width * 0.6);
       return {
         width: `${textWidth}px`,
-        left: `${centerPosition - textWidth / 2}px`,
-        top: '180px',
         fontSize: '36px',
         lineHeight: '54px'
       };
     } else if (isTablet) {
-      // Tablet - centered with proportional sizing
-      const centerPosition = width / 2;
+      // Tablet - proportional sizing
       const textWidth = width * 0.7;
       return {
         width: `${textWidth}px`,
-        left: `${centerPosition - textWidth / 2}px`,
-        top: '160px',
         fontSize: '32px',
         lineHeight: '48px'
       };
     } else if (isExtraSmall) {
-      // iPhone SE - centered with even smaller text and narrower container
-      const centerPosition = width / 2;
+      // iPhone SE - even smaller text and narrower container
       const textWidth = width * 0.92; // Wider container for small screens (92% of viewport)
       return {
         width: `${textWidth}px`,
-        left: `${centerPosition - textWidth / 2}px`,
-        top: '100px', // Reduced top spacing
         fontSize: '18px', // Smaller font size for iPhone SE
         lineHeight: '26px' // Tighter line height
       };
     } else {
-      // Mobile - centered with smaller text
-      const centerPosition = width / 2;
+      // Mobile - smaller text
       const textWidth = width * 0.85;
       return {
         width: `${textWidth}px`,
-        left: `${centerPosition - textWidth / 2}px`,
-        top: '140px',
         fontSize: '24px',
         lineHeight: '36px'
       };
@@ -144,40 +130,40 @@ export default function TextSection({
         className="w-full mx-auto flex items-center justify-center max-w-[1440px] relative"
         style={{ height: getSectionHeight() }}
       >
-        {textLines.map((line, i) => (
-          <div
-            key={i}
-            className="absolute transition-all duration-700"
-            style={{
-              width: textPosition.width,
-              left: textPosition.left,
-              top: textPosition.top,
-              opacity: i === activeIndex ? 1 : 0,
-              transform: i === activeIndex ? 'translateY(0)' : 
-                        i < activeIndex ? 'translateY(-40px)' : 'translateY(40px)',
-              pointerEvents: 'none'
-            }}
-          >
-            <p
-              className="font-normal text-center tracking-[-0.02em] text-[#192124] uppercase"
+        <div className="relative w-full h-full flex items-center justify-center">
+          {textLines.map((line, i) => (
+            <div
+              key={i}
+              className="absolute transition-all duration-700"
               style={{
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: textPosition.fontSize,
-                lineHeight: textPosition.lineHeight,
-                maxWidth: '100%',
-                height: 'auto',
-                minHeight: isExtraSmall ? '50px' : isMobile ? '80px' : '120px', // Reduced min height for extra small screens
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: isExtraSmall ? '0 4px' : '0',
-                wordBreak: isExtraSmall ? 'break-word' : 'normal' // Allow word breaking on very small screens
+                width: textPosition.width,
+                opacity: i === activeIndex ? 1 : 0,
+                transform: i === activeIndex ? 'translateY(0)' : 
+                          i < activeIndex ? 'translateY(-40px)' : 'translateY(40px)',
+                pointerEvents: 'none'
               }}
             >
-              {line}
-            </p>
-          </div>
-        ))}
+              <p
+                className="font-normal text-center tracking-[-0.02em] text-[#192124] uppercase"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: textPosition.fontSize,
+                  lineHeight: textPosition.lineHeight,
+                  maxWidth: '100%',
+                  height: 'auto',
+                  minHeight: isExtraSmall ? '50px' : isMobile ? '80px' : '120px', // Reduced min height for extra small screens
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: isExtraSmall ? '0 4px' : '0',
+                  wordBreak: isExtraSmall ? 'break-word' : 'normal' // Allow word breaking on very small screens
+                }}
+              >
+                {line}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

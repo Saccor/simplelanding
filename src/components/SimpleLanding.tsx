@@ -114,7 +114,7 @@ export default function SimpleLanding({
       />
       
       {/* Hero Section */}
-      <section className="w-full bg-black flex justify-center">
+      <section className="w-full bg-black flex justify-center items-center">
         <div className="video-container">
           <video
             ref={videoRef}
@@ -148,6 +148,13 @@ export default function SimpleLanding({
 
           {/* Overlay for better visibility */}
           <div className="absolute inset-0 bg-black/30 z-[1]"></div>
+          
+          {/* Center text if needed */}
+          <div className="absolute z-[2] w-full h-full flex items-center justify-center">
+            <div className="text-white text-center">
+              {/* Add centered content here if needed */}
+            </div>
+          </div>
           
           {/* Down Arrow */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[2] animate-bounce">
