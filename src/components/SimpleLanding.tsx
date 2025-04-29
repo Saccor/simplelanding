@@ -34,7 +34,7 @@ export default function SimpleLanding({
   subHeading = "THAT'S MORE THAN SMART",
   emailHeading = "We're shaping a sustainable future for audio devices.",
   emailSubtext = "More to come - stay tuned",
-  emailImage = "/Arfve6.jpg",
+  emailImage = "/images/Arfve5.jpg",
   initialMuted = true,
   onMuteChange
 }: SimpleLandingProps) {

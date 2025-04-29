@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, RefObject } from 'react';
+import { useEffect, RefObject, useState } from 'react';
 
 interface UseScrollObserverProps {
   ref: RefObject<HTMLElement | null>;
@@ -15,8 +15,15 @@ export default function useScrollObserver({
   rootMargin = "0px",
   onIntersect
 }: UseScrollObserverProps) {
+  const [hasMounted, setHasMounted] = useState(false);
+
   useEffect(() => {
-    if (!ref.current) return;
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only run on client-side after component has mounted
+    if (!hasMounted || !ref.current || typeof IntersectionObserver === 'undefined') return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -41,5 +48,5 @@ export default function useScrollObserver({
         observer.unobserve(element);
       }
     };
-  }, [ref, threshold, rootMargin, onIntersect]);
+  }, [ref, threshold, rootMargin, onIntersect, hasMounted]);
 } 

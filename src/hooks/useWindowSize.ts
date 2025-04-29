@@ -21,21 +21,25 @@ interface WindowSize {
   isLargeDesktop: boolean;
 }
 
+// Default values for server-side rendering
+const defaultValues: WindowSize = {
+  width: breakpoints.lg, // Default to a desktop-like width
+  height: 800,
+  isMobile: false,
+  isTablet: false,
+  isDesktop: true,
+  isLargeDesktop: false
+};
+
 export default function useWindowSize(): WindowSize {
-  // Initialize with reasonable defaults
-  const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: typeof window !== 'undefined' ? window.innerWidth : breakpoints.xxl,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800,
-    isMobile: false,
-    isTablet: false,
-    isDesktop: false,
-    isLargeDesktop: true
-  });
+  // Set initial state to values that won't cause hydration mismatches
+  const [windowSize, setWindowSize] = useState<WindowSize>(defaultValues);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    // Only execute on the client
-    if (typeof window === 'undefined') return;
-
+    // Mark component as mounted
+    setHasMounted(true);
+    
     // Handler to call on window resize
     function handleResize() {
       const width = window.innerWidth;
@@ -62,5 +66,7 @@ export default function useWindowSize(): WindowSize {
     return () => window.removeEventListener('resize', handleResize);
   }, []); // Empty array ensures that effect is only run on mount and unmount
 
-  return windowSize;
+  // During SSR or before hydration, return default values
+  // After hydration, return actual window size
+  return hasMounted ? windowSize : defaultValues;
 } 
