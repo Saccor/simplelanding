@@ -197,12 +197,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             bottom: '10%' // Position from bottom
           }}
         >
-          <span className="text-white text-base mb-3 opacity-80 group-hover:opacity-100 transition-opacity font-medium">
-            Scroll Down
-          </span>
           <div className="animate-bounce">
             <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 1.81059L36 21.0569L70 1.8106" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 1.81059L36 21.0569L70 1.8106" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </button>
