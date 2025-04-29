@@ -36,35 +36,6 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
     };
   }, [scrolled]);
 
-  // Calculate sound button position based on screen size
-  const getSoundButtonPosition = () => {
-    const isExtraSmall = width <= breakpoints.xs;
-    
-    if (isLargeDesktop) {
-      return {
-        right: '124px'
-      };
-    } else if (isDesktop) {
-      return {
-        right: '50px'
-      };
-    } else if (isTablet) {
-      return {
-        right: '24px'
-      };
-    } else if (isExtraSmall) {
-      // Extra small screens like iPhone SE
-      return {
-        right: '6px' // Even closer to the edge for tiny screens
-      };
-    } else {
-      // Mobile positioning
-      return {
-        right: '12px'
-      };
-    }
-  };
-
   // Get padding based on screen size
   const getHeaderPadding = () => {
     if (width <= breakpoints.xs) {
@@ -80,32 +51,13 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
     return '64px 124px'; // Large desktop
   };
 
-  // Get button size based on screen size
-  const getButtonSize = () => {
-    if (width <= breakpoints.xs) {
-      return {
-        width: '32px', // Smaller button for iPhone SE
-        height: '32px',
-        top: '12px' // Reduced top margin
-      };
-    }
-    
-    return {
-      width: '40px',
-      height: '40px',
-      top: '24px'
-    };
-  };
-
   // Only calculate these values client-side to avoid hydration mismatches
   const headerPadding = mounted ? getHeaderPadding() : '64px 124px';
-  const buttonSize = mounted ? getButtonSize() : { width: '40px', height: '40px', top: '24px' };
   const headerHeight = mounted ? (isExtraSmall ? '60px' : isMobile ? '70px' : '87px') : '87px';
   
-  // Logo and icon sizes
+  // Logo sizes
   const logoWidth = mounted ? (isExtraSmall ? 70 : isMobile ? 90 : 118.15) : 118.15;
   const logoHeight = mounted ? (isExtraSmall ? 24 : isMobile ? 32 : 41) : 41;
-  const iconSize = mounted ? (isExtraSmall ? "18" : "24") : "24";
 
   return (
     <header 
@@ -131,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
         />
       </div>
       
-      {/* Empty div for right side to maintain layout */}
+      {/* Spacer for right side to balance the layout */}
       <div className="flex-1"></div>
     </header>
   );

@@ -74,13 +74,14 @@ export default function SimpleLanding({
   };
 
   return (
-    <main>
+    <main className="flex flex-col w-full">
+      {/* Fixed Header - always visible */}
       <Header 
         isMuted={isMuted} 
         onToggleMute={handleToggleMute} 
       />
       
-      {/* Hero Section */}
+      {/* Fullscreen Hero Section */}
       <HeroSection
         videoUrl={videoUrl}
         mobileVideoUrl={mobileVideoUrl}
@@ -88,27 +89,31 @@ export default function SimpleLanding({
         onToggleMute={handleToggleMute}
       />
 
-      {/* Text Section */}
-      <TextSection
-        textLines={[
-          mainHeading,
-          subHeading,
-          "IT'S INTELLIGENT, SUSTAINABLE, AND DESIGNED WITH PURPOSE.",
-          "THIS ISN'T JUST A COMPANY",
-          "IT'S A CHALLENGE TO THE INDUSTRY.",
-          "IT'S A COMMITMENT TO A BETTER WAY",
-          "IT'S A CALL TO EVERYONE WHO BELIEVES IN A FUTURE WHERE TECHNOLOGY WORKS FOR US—NOT AGAINST US."
-        ]}
-      />
+      {/* Content Sections */}
+      <div id="content" className="w-full">
+        {/* Text Section */}
+        <TextSection
+          textLines={[
+            mainHeading,
+            subHeading,
+            "IT'S INTELLIGENT, SUSTAINABLE, AND DESIGNED WITH PURPOSE.",
+            "THIS ISN'T JUST A COMPANY",
+            "IT'S A CHALLENGE TO THE INDUSTRY.",
+            "IT'S A COMMITMENT TO A BETTER WAY",
+            "IT'S A CALL TO EVERYONE WHO BELIEVES IN A FUTURE WHERE TECHNOLOGY WORKS FOR US—NOT AGAINST US."
+          ]}
+        />
 
-      {/* Use the standalone EmailSection component */}
-      <EmailSection
-        emailHeading={emailHeading}
-        emailSubtext={emailSubtext}
-        emailImage={emailImage}
-      />
-      
-      <Footer />
+        {/* Email Section */}
+        <EmailSection
+          emailHeading={emailHeading}
+          emailSubtext={emailSubtext}
+          emailImage={emailImage}
+        />
+        
+        {/* Footer */}
+        <Footer />
+      </div>
     </main>
   );
 } 

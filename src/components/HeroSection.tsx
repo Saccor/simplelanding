@@ -20,6 +20,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
 
@@ -65,6 +66,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       videoRef.current.muted = isMuted;
     }
   }, [isMuted]);
+
+  // Handle scroll down button click
+  const handleScrollDown = () => {
+    // Try to find the content section by ID
+    const contentSection = document.getElementById('content');
+    if (contentSection) {
+      contentSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback to next sibling if content ID not found
+      const nextSection = sectionRef.current?.nextElementSibling;
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   // Calculate sound button position based on screen size
   const getSoundButtonPosition = () => {
@@ -121,12 +137,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const iconSize = mounted ? (isExtraSmall ? "18" : "24") : "24";
 
   return (
-    <section className="w-full bg-black hero-section">
-      <div className="video-container">
+    <section 
+      ref={sectionRef}
+      className="w-full bg-black"
+      style={{ 
+        height: '100vh', // Full viewport height
+        position: 'relative',
+        minHeight: '520px',
+        width: '100%'
+      }}
+    >
+      <div className="relative w-full h-full">
         <video
           ref={videoRef}
           className={`
-            w-full h-full
+            absolute inset-0 w-full h-full
             object-cover object-center
             transition-opacity duration-700
             ${isVideoLoading ? 'opacity-0' : 'opacity-100'}
@@ -155,7 +180,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         
         {/* Loading Spinner */}
         {isVideoLoading && (
-          <div className="absolute inset-0 w-full bg-black flex items-center justify-center">
+          <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
             <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         )}
@@ -163,16 +188,28 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Overlay for better visibility */}
         <div className="absolute inset-0 bg-black/30"></div>
 
-        {/* Down Arrow */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[2] animate-bounce">
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
+        {/* Scroll Down Button - Centered at bottom */}
+        <button 
+          onClick={handleScrollDown}
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[3] flex flex-col items-center cursor-pointer focus:outline-none group scroll-down-btn"
+          aria-label="Scroll down to content"
+          style={{
+            bottom: '10%' // Position from bottom
+          }}
+        >
+          <span className="text-white text-base mb-3 opacity-80 group-hover:opacity-100 transition-opacity font-medium">
+            Scroll Down
+          </span>
+          <div className="animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </button>
 
-        {/* Sound Button */}
+        {/* Sound Button - Absolute position in Hero section */}
         <div 
-          className="fixed z-[5]"
+          className="absolute z-[5]"
           style={{ 
             top: buttonPosition.top,
             right: buttonPosition.right
