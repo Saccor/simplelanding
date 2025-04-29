@@ -74,12 +74,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     if (isExtraSmall) {
       // Extra small screens like iPhone SE need specialized layout
       return {
-        position: 'absolute' as const,
+        position: 'relative' as const,
         width: '94%', 
         maxWidth: '607px',
         height: 'auto',
-        left: '3%',
-        top: '290px',
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column' as const,
         alignItems: 'flex-start' as const,
@@ -88,12 +87,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       };
     } else if (isMobile) {
       return {
-        position: 'absolute' as const,
+        position: 'relative' as const,
         width: '90%',
         maxWidth: '607px',
         height: 'auto',
-        left: '5%',
-        top: '320px',
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column' as const,
         alignItems: 'flex-start' as const,
@@ -102,13 +100,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       };
     } else if (isTablet) {
       return {
-        position: 'absolute' as const,
+        position: 'relative' as const,
         width: '80%',
         maxWidth: '607px',
         height: 'auto',
-        left: '50%',
-        top: '150px',
-        transform: 'translateX(-50%)',
+        margin: '0 auto',
         display: 'flex',
         flexDirection: 'column' as const,
         alignItems: 'flex-start' as const,
@@ -119,18 +115,15 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     
     // Desktop default
     return {
-      position: 'absolute' as const,
+      position: 'relative' as const,
       width: '607px',
-      height: 'auto', // Changed from fixed height to auto
-      left: '653.99px',
-      top: '135.5px',
+      height: 'auto',
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'flex-start' as const,
       padding: '0px',
       gap: '42px',
-      maxWidth: 'calc(100% - 488px)',
-      right: '0',
+      maxWidth: 'calc(100% - 30px)',
     };
   };
 
@@ -138,53 +131,42 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const getImageStyle = () => {
     if (isExtraSmall) {
       return {
-        position: 'absolute' as const,
+        position: 'relative' as const,
         width: '100%',
-        height: '280px', // Increased from 270px to provide more image visibility
-        left: '0px',
-        top: '0px',
+        height: '280px',
         overflow: 'hidden' as const,
       };
     } else if (isMobile) {
       return {
-        position: 'absolute' as const,
+        position: 'relative' as const,
         width: '100%',
         height: '300px',
-        left: '0px',
-        top: '0px',
         overflow: 'hidden' as const,
       };
     }
     
     // Tablet and Desktop default
     return {
-      position: 'absolute' as const,
-      width: '488px',
+      position: 'relative' as const,
+      width: '100%',
       height: '650px',
-      left: '0px',
-      top: '0px',
-      maxWidth: isTablet ? '40%' : '50%',
       overflow: 'hidden' as const,
     };
   };
 
   // Get section container dimensions based on screen size
   const getSectionStyle = () => {
-    // Extra height for small screens so content doesn't get cut off
-    const height = isExtraSmall ? '600px' // Adjusted height for iPhone SE
-                 : isMobile ? '700px' 
-                 : '650px';
-    
     return {
-      width: '100%', // Changed from fixed to 100%
+      width: '100%',
       maxWidth: '1440px',
-      height,
       background: '#F3F3F3',
       position: 'relative' as const,
       flexGrow: 0,
       zIndex: 2,
       margin: '0 auto',
-      overflow: 'hidden' as const, // Prevent content from overflowing
+      overflow: 'hidden' as const,
+      display: 'flex' as const,
+      flexDirection: isMobile || isExtraSmall ? 'column' as const : 'row' as const,
     };
   };
 
@@ -241,7 +223,10 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   return (
     <section style={sectionStyle}>
       {/* Left side - Image */}
-      <div style={imageStyle}>
+      <div style={{
+        ...imageStyle,
+        flex: isMobile || isExtraSmall ? 'none' : '0 0 40%'
+      }}>
         <Image
           src={emailImage}
           alt="Arfve earbuds"
@@ -258,7 +243,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       </div>
       
       {/* Right side - Content */}
-      <div style={rightContentStyle}>
+      <div style={{
+        ...rightContentStyle,
+        flex: isMobile || isExtraSmall ? 'none' : '0 0 60%',
+        padding: isMobile || isExtraSmall ? '20px 16px' : '135.5px 40px 40px 40px',
+      }}>
         {/* Heading section */}
         <div style={{
           display: 'flex',
