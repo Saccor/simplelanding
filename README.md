@@ -8,9 +8,10 @@ This project is a responsive landing page for Arfve, showcasing the brand's focu
 
 ## Features
 
-- Responsive design optimized for all device sizes
+- Responsive design optimized for all device sizes (from iPhone SE to large desktops)
 - Hero section with full-screen background video
 - Interactive sound toggle for hero video
+- Scrolling text animation with automatic text transitions
 - Email signup form with validation and success/error states
 - Clean, minimalist UI following modern design principles
 - Animated transitions and loading states
@@ -65,9 +66,15 @@ simplelanding/
 │ │ ├── SimpleLanding.tsx # Main container component
 │ │ ├── Header.tsx        # Site header with logo and sound toggle
 │ │ ├── HeroSection.tsx   # Video background hero section
-│ │ ├── TextSection.tsx   # Text content section
+│ │ ├── TextSection.tsx   # Text content section with scroll animation
 │ │ ├── EmailSection.tsx  # Email signup form section
 │ │ └── Footer.tsx        # Site footer with links
+│ │
+│ ├── hooks/
+│ │ ├── useWindowSize.ts  # Custom hook for responsive breakpoints
+│ │ └── useScrollObserver.ts # Custom hook for scroll animations
+│ │
+│ └── utils/              # Utility functions
 │
 ├── public/               # Static assets
 │ ├── images/             # Image assets directory
@@ -80,7 +87,7 @@ simplelanding/
 │ └── volume-off.svg      # Sound icon for video muted state
 │
 ├── next.config.js        # Next.js configuration (includes video file handling)
-├── next.config.ts        # TypeScript version of Next.js config
+├── tailwind.config.js    # Tailwind CSS configuration with custom breakpoints
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
 ├── postcss.config.mjs    # PostCSS configuration for Tailwind
@@ -103,15 +110,59 @@ The main container component that:
 - Displays the logo
 - Provides video sound toggle
 - Changes appearance on scroll
+- Adjusts size and spacing based on device size
+
+### TextSection Component (`src/components/TextSection.tsx`)
+- Displays animated text lines that change on scroll
+- Uses scroll percentage to determine which text line to show
+- Fully responsive with adjustments for screen sizes down to iPhone SE
+- Uses dynamic sizing and positioning based on viewport width
+
+### EmailSection Component (`src/components/EmailSection.tsx`)
+- Displays product image with responsive adjustments
+- Contains email signup form
+- Handles form submission states
+- Adjusts layout for different device sizes, including specific optimizations for small screens
 
 ### Footer Component (`src/components/Footer.tsx`)
 - Displays logo, copyright, and policy links
 - Contains social media links
+- Adjusts layout for mobile screens (column vs. row layout)
 
-### Email Section (`src/components/EmailSection.tsx`)
-- Displays product image
-- Contains email signup form
-- Handles form submission states
+## Responsive Design Approach
+
+The site uses a comprehensive approach to responsive design:
+
+### Breakpoint System
+Defined breakpoints in `src/hooks/useWindowSize.ts`:
+- xs: 480px (iPhone SE and similar small devices)
+- sm: 640px
+- md: 768px (tablets)
+- lg: 1024px
+- xl: 1280px
+- xxl: 1440px
+
+### Device Detection
+The `useWindowSize` hook provides:
+- Current viewport dimensions
+- Boolean flags for device types (isMobile, isTablet, isDesktop, isLargeDesktop)
+- Extra small device detection for very small screens
+
+### Responsive Implementation
+Each component implements responsive design through:
+1. **Fluid Layouts**: Using percentage-based widths
+2. **Conditional Styling**: Different styles applied based on device type
+3. **Dynamic Calculations**: Position and size calculations based on viewport width
+4. **Special Mobile Handling**: Extra optimizations for iPhone SE and small devices
+5. **Tailwind Classes**: Utility classes for responsive properties
+
+### Mobile Optimizations
+Special considerations for mobile devices:
+- Reduced font sizes
+- Adjusted spacing and paddings
+- Simplified layouts
+- Focused image cropping
+- Touch-friendly button sizes
 
 ## Media Assets
 
@@ -126,43 +177,83 @@ The landing page requires the following media assets:
 
 Note that the Hero video file (`public/HeroVideo1.mp4`) is very large (533MB) and the product image (`public/Arfve6.jpg`) is 17MB. When cloning this repository, you may need to get these files separately if they're not included in the repository due to size constraints.
 
-## Configuration Details
+## Custom Hooks
 
-### Video Handling in Next.js
-The project uses `file-loader` to handle video files in development. This is configured in `next.config.js`.
+### useWindowSize
+A responsive design hook that:
+- Detects current viewport dimensions
+- Determines device type based on breakpoints
+- Provides boolean flags for responsive conditions
+- Re-renders components when screen size changes
 
-### Development with Turbopack
-The project is configured to use Turbopack in development for faster builds. This is set in the `dev` script in `package.json`.
+### useScrollObserver
+A hook for scroll-based animations that:
+- Observes elements entering the viewport
+- Adds CSS classes based on visibility
+- Controls animation timing
+- Supports custom thresholds for animation triggers
 
-## Key Implementation Notes
+## Future Development Guidelines
 
-1. **Video Loading**: The SimpleLanding component handles video loading states with a loading spinner.
+### 1. Responsive Design
+When adding new components or modifying existing ones:
+- Always test on multiple screen sizes, particularly:
+  - iPhone SE (320px width) - most challenging
+  - Mobile phones (375-428px)
+  - Tablets (768px) 
+  - Desktops (1024px+)
+- Use the `useWindowSize` hook for responsive logic
+- Add special handling for iPhone SE where needed
+- Verify all content is visible without horizontal scrolling
+- Ensure text remains readable at all sizes
 
-2. **Email Form**: The form currently logs submissions to the console. A TODO remains to implement the actual API endpoint for email signup.
+### 2. Component Modifications
+When modifying existing components:
+- The `TextSection` scrolling animation is sensitive to timing - maintain the scrollPercentage calculation 
+- For `EmailSection`, preserve the specialized mobile layouts for small screens
+- Maintain the current approach of using inline styles with device-specific calculations
 
-3. **Responsive Design**: The site uses Tailwind's responsive classes to adapt to different screen sizes.
+### 3. Performance Considerations
+For future optimizations:
+- Consider serving different sized video files for different devices
+- Implement lazy loading for below-the-fold content
+- Further optimize images with next/image quality settings
+- Consider using WebP format for image assets
 
-4. **Sound Control**: Video sound is controlled globally with a state that's passed down from the page component.
+### 4. Adding New Sections
+When adding new page sections:
+- Follow the pattern of creating responsive styles based on device size
+- Use percentage-based widths where possible
+- Create device-specific layouts where needed
+- Maintain the z-index hierarchy (header: 4, email section: 2, text section: 1)
 
-## To-Do Items
+### 5. API Integration
+For implementing the email signup functionality:
+- Add API endpoint for email collection in pages/api directory
+- Update the handleSubmit function in EmailSection.tsx
+- Ensure proper error handling and loading states
+- Add CSRF protection for the form submission
 
-- [ ] Implement backend API for email signup collection
-- [ ] Add proper link destinations in the Footer component
-- [ ] Add analytics tracking
-- [ ] Improve video loading performance and optimize large media files
-- [ ] Add proper privacy policy and cookie settings pages
-- [ ] Implement proper error handling for the email form
-- [ ] Add more interactive elements and animations
-- [ ] Optimize images and videos for different screen sizes
-- [ ] Add internationalization support
+### 6. Browser Compatibility
+The site has been tested on:
+- Chrome (latest)
+- Safari (latest)
+- Firefox (latest) 
+- Edge (latest)
 
-## Development Guidelines
+When making changes, test across these browsers and ensure compatibility with:
+- iOS Safari
+- Chrome for Android
 
-1. Follow existing code style and component structure
-2. Maintain responsive design principles across all components
-3. Optimize media assets before adding them to the project
-4. Test across multiple device sizes and browsers
-5. Keep accessibility in mind when making UI changes
+## Known Issues and Limitations
+
+1. **Email Form**: The form currently logs submissions to the console. A backend API needs to be implemented.
+
+2. **Video Loading**: On slow connections, the initial video loading can take time - consider adding a placeholder image.
+
+3. **iPhone SE Layout**: While optimized, some edge cases may still exist with extremely small screens where text might be difficult to read.
+
+4. **Scroll Animation**: The text section animation depends on scroll position and may behave differently on various browser/device combinations.
 
 ## License
 
