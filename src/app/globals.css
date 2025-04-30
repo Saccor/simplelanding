@@ -22,48 +22,24 @@ body {
   min-width: 320px;
 }
 
-/* …your other global rules… */
-
-/* Footer container - mobile first approach */
-.footer-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 16px;
-  gap: 24px;
-  width: 100%;
-  background: #FFFFFF;
-  flex: none;
-  order: 3;
-  flex-grow: 0;
-  z-index: 3;
-  margin: 0 auto;
+/* Center content on larger screens */
+main > div,
+section > div {
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Responsive adjustments for footer */
-@media (min-width: 640px) {
-  .footer-container {
-    padding: 28px 24px;
-    gap: 28px;
-  }
+/* Ensure text containers are centered on larger screens */
+.text-container {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
-@media (min-width: 768px) {
-  .footer-container {
-    padding: 30px 40px;
-    gap: 30px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .footer-container {
-    padding: 32px 60px;
-    gap: 32px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .footer-container {
-    padding: 32px 124px;
+/* Custom responsive adjustments for large screens */
+@media (min-width: 1440px) {
+  .content-container {
+    max-width: 1440px;
+    margin: 0 auto;
   }
 }

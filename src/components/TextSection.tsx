@@ -82,7 +82,7 @@ export default function TextSection({
       maxWidth = 'max-w-[618px]';
     }
     
-    return `font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-['Poppins',_sans-serif] ${textSize} ${lineHeight} ${maxWidth}`;
+    return `font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-['Poppins',_sans-serif] ${textSize} ${lineHeight} ${maxWidth} mx-auto`;
   };
 
   // Get section height based on screen size
@@ -100,7 +100,7 @@ export default function TextSection({
         className={`w-full mx-auto flex items-center justify-center max-w-[1440px] ${mounted ? getSectionHeight() : 'h-[522px]'}`}
       >
         <div className="w-full h-full flex items-center justify-center relative" style={{ perspective: '1000px' }}>
-          <div className="relative overflow-hidden w-full px-2">
+          <div className="relative overflow-hidden w-full px-2 flex justify-center">
             {textLines.map((line, i) => {
               const isActive = i === activeIndex;
               
@@ -113,7 +113,7 @@ export default function TextSection({
                       : 'opacity-0 translate-y-5 absolute'
                   }`}
                 >
-                  <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-[40px] leading-[60px] max-w-[618px]'}>
+                  <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-[40px] leading-[60px] max-w-[618px] mx-auto'}>
                     {line}
                   </p>
                 </div>
