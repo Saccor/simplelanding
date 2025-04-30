@@ -39,5 +39,6 @@ next-env.d.ts
 public/HeroVideo\ 1.mp4
 public/HeroVideo1.mp4
 public/videos/Hero\ v2.mp4
-# All large video files
+# All large video files except compressed ones
 public/videos/*.mp4
+!public/videos/Hero\ v2-compressed.mp4
