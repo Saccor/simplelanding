@@ -8,7 +8,7 @@ import { useModal } from './ModalProvider';
 import { Cookies } from 'react-cookie-consent';
 
 const Footer: React.FC = () => {
-  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
   const [mounted, setMounted] = useState(false);
   
@@ -46,162 +46,81 @@ const Footer: React.FC = () => {
     window.location.reload();
   };
 
-  // Scale logo and elements based on screen size - improved for extra small screens
+  // Scale logo and elements based on screen size
   const logoWidth = mounted ? (isExtraSmall ? 60 : isMobile ? 70 : isTablet ? 80 : 88) : 88;
   const logoHeight = mounted ? (isExtraSmall ? 18 : isMobile ? 21 : isTablet ? 24 : 27) : 27;
-  const textSize = mounted ? (isExtraSmall ? '10px' : isMobile ? '12px' : isTablet ? '14px' : '16px') : '16px';
-  const textLineHeight = mounted ? (isExtraSmall ? '16px' : isMobile ? '18px' : isTablet ? '20px' : '24px') : '24px';
-  const linkGap = mounted ? (isExtraSmall ? '6px' : isMobile ? '8px' : isTablet ? '10px' : '12px') : '12px';
-  const iconScale = mounted ? (isExtraSmall ? 0.7 : isMobile ? 0.8 : isTablet ? 0.9 : 1) : 1;
-  const iconGap = mounted ? (isExtraSmall ? '8px' : isMobile ? '12px' : isTablet ? '15px' : '18px') : '18px';
   
-  // Calculate width to match the specs for larger screens
-  const centerSectionWidth = mounted ? (isExtraSmall ? 'auto' : isMobile ? '280px' : isTablet ? '320px' : '387.33px') : '387.33px';
-  
-  // Calculate appropriate padding based on screen size
-  const getContainerPadding = () => {
-    if (isExtraSmall) return '12px 10px';
-    if (isMobile) return '16px 20px';
-    if (isTablet) return '20px 40px';
-    if (isDesktop) return '24px 60px';
-    return '32px 124px'; // isLargeDesktop
+  // Get content layout classes based on screen size
+  const getFooterLayoutClasses = () => {
+    if (isExtraSmall || isMobile) {
+      return 'flex-col items-center justify-center gap-4 md:gap-0 md:flex-row md:justify-between';
+    }
+    return 'flex-row items-center justify-between';
   };
 
-  // Only get padding if mounted to avoid hydration mismatch
-  const containerPadding = mounted ? getContainerPadding() : '32px 124px';
+  // Generate text and icon size classes
+  const getTextSizeClass = () => {
+    if (isExtraSmall) return 'text-xs';
+    if (isMobile) return 'text-sm';
+    if (isTablet) return 'text-base';
+    return 'text-base';
+  };
   
-  // Calculate flex direction based on screen size
-  const flexDirection = mounted && (isExtraSmall || isMobile) ? 'column' : 'row';
-  const alignItems = mounted && (isExtraSmall || isMobile) ? 'center' : 'center';
-  const justifyContent = mounted && (isExtraSmall || isMobile) ? 'center' : 'space-between';
-  const itemsGap = mounted ? (isExtraSmall ? '16px' : isMobile ? '20px' : '0px') : '0px';
+  const getIconScale = () => {
+    if (isExtraSmall) return 'scale-70';
+    if (isMobile) return 'scale-80';
+    if (isTablet) return 'scale-90';
+    return 'scale-100';
+  };
+  
+  // Icon gap classes
+  const iconGapClass = isExtraSmall ? 'gap-2' : isMobile ? 'gap-3' : isTablet ? 'gap-4' : 'gap-5';
 
   return (
     <footer className="w-full bg-white flex justify-center">
-      <div 
-        className="w-full max-w-[1440px] flex justify-center bg-white footer-container"
-        style={{
-          padding: containerPadding
-        }}
-      >
-        {/* Main footer container with dynamic flex layout */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: flexDirection,
-            justifyContent: justifyContent,
-            alignItems: alignItems,
-            padding: '0px',
-            gap: itemsGap,
-            width: '100%',
-            height: 'auto',
-            flex: 'none',
-            order: 0,
-            flexGrow: 0
-          }}
-        >
+      <div className="w-full max-w-[1440px] flex justify-center bg-white footer-container">
+        {/* Main footer container with responsive layout */}
+        <div className={`w-full ${mounted ? getFooterLayoutClasses() : 'flex-row items-center justify-between'}`}>
           {/* Left section - Logo */}
-          <div className="flex-none" style={{ flex: '0 0 auto' }}>
+          <div className="flex-none">
             <Image 
               src="/arfve-logo-dark.svg"
               alt="Arfve"
               width={logoWidth}
               height={logoHeight}
-              className="footer-logo"
-              style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
+              className="footer-logo w-auto h-auto object-contain"
             />
           </div>
 
           {/* Middle section - Links and copyright */}
-          <div 
-            className="flex justify-center items-center"
-            style={{
-              flex: flexDirection === 'column' ? '0 0 auto' : '1',
-              order: flexDirection === 'column' ? '2' : '1'
-            }}
-          >
-            <div 
-              className="flex items-center flex-wrap justify-center center-links-container"
-              style={{
-                gap: linkGap,
-                fontSize: textSize,
-                fontFamily: "'Poppins', sans-serif",
-                fontStyle: 'normal',
-                fontWeight: 400,
-                lineHeight: textLineHeight,
-                color: '#000000',
-                width: centerSectionWidth,
-                height: 'auto',
-                margin: '0 auto',
-                flex: 'none',
-                flexGrow: 0
-              }}
-            >
+          <div className={`flex justify-center items-center flex-1 ${mounted && (isExtraSmall || isMobile) ? 'order-last mt-4' : ''}`}>
+            <div className={`flex items-center flex-wrap justify-center center-links-container gap-2 sm:gap-3 ${mounted ? getTextSizeClass() : 'text-base'} font-['Poppins',_sans-serif] text-black`}>
               <button 
                 onClick={handlePrivacyPolicyClick}
-                className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text"
-                style={{
-                  width: 'auto',
-                  fontFamily: "'Poppins', sans-serif",
-                  fontWeight: 400,
-                  flex: 'none',
-                  flexGrow: 0,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
+                className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text font-['Poppins',_sans-serif] font-normal flex items-center"
               >
                 Privacy policy
               </button>
               <button 
                 onClick={handleCookieSettings}
-                className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text"
-                style={{
-                  width: 'auto',
-                  fontFamily: "'Poppins', sans-serif",
-                  fontWeight: 400,
-                  flex: 'none',
-                  flexGrow: 0,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
+                className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text font-['Poppins',_sans-serif] font-normal flex items-center"
               >
                 Cookie settings
               </button>
-              <span 
-                className="whitespace-nowrap footer-text copyright-text"
-                style={{
-                  width: 'auto',
-                  fontFamily: "'Poppins', sans-serif",
-                  fontWeight: 400,
-                  flex: 'none',
-                  flexGrow: 0,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
+              <span className="whitespace-nowrap footer-text copyright-text font-['Poppins',_sans-serif] font-normal flex items-center">
                 © 2025 Arfve
               </span>
             </div>
           </div>
 
           {/* Right section - Social Media Icons */}
-          <div 
-            className="flex items-center" 
-            style={{ 
-              flex: '0 0 auto',
-              order: flexDirection === 'column' ? '1' : '2'
-            }}
-          >
-            <div 
-              className="flex items-center social-icons-container"
-              style={{
-                gap: iconGap,
-              }}
-            >
+          <div className={`flex items-center ${mounted && (isExtraSmall || isMobile) ? 'order-first' : ''}`}>
+            <div className={`flex items-center social-icons-container ${mounted ? iconGapClass : 'gap-5'}`}>
               <Link href="https://www.youtube.com/@arfve" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="hover:opacity-80 transition-opacity footer-social-icon">
                 <svg 
-                  width={30 * iconScale} 
-                  height={21 * iconScale} 
+                  className={mounted ? getIconScale() : 'scale-100'}
+                  width={30} 
+                  height={21} 
                   viewBox="0 0 30 21" 
                   fill="none" 
                   xmlns="http://www.w3.org/2000/svg"
@@ -211,8 +130,9 @@ const Footer: React.FC = () => {
               </Link>
               <Link href="https://www.instagram.com/arfve_legacy/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:opacity-80 transition-opacity footer-social-icon">
                 <svg 
-                  width={30 * iconScale} 
-                  height={31 * iconScale} 
+                  className={mounted ? getIconScale() : 'scale-100'}
+                  width={30} 
+                  height={31}
                   viewBox="0 0 30 31" 
                   fill="none" 
                   xmlns="http://www.w3.org/2000/svg"
@@ -222,8 +142,9 @@ const Footer: React.FC = () => {
               </Link>
               <Link href="https://linkedin.com/company/arfve" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:opacity-80 transition-opacity footer-social-icon">
                 <svg 
-                  width={30 * iconScale} 
-                  height={31 * iconScale} 
+                  className={mounted ? getIconScale() : 'scale-100'}
+                  width={30} 
+                  height={31}
                   viewBox="0 0 30 31" 
                   fill="none" 
                   xmlns="http://www.w3.org/2000/svg"

@@ -21,7 +21,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const [mounted, setMounted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
 
   // This helps avoid hydration mismatches
@@ -56,7 +56,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('error', handleError as EventListener);
     };
-  }, [videoUrl]); // Added videoUrl as dependency
+  }, [videoUrl]); 
 
   // Update video muted state
   useEffect(() => {
@@ -87,56 +87,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     }
   };
 
-  // Calculate sound button position based on screen size
-  const getSoundButtonPosition = () => {
-    if (isLargeDesktop) {
-      return {
-        right: '124px',
-        top: '24px'
-      };
-    } else if (isDesktop) {
-      return {
-        right: '50px',
-        top: '24px'
-      };
+  // Get button size based on screen size - using tailwind classes
+  const getSoundButtonClasses = () => {
+    let positionClasses = '';
+    let sizeClasses = '';
+    
+    // Position classes
+    if (isExtraSmall) {
+      positionClasses = 'top-3 right-1.5';
+    } else if (isMobile) {
+      positionClasses = 'top-6 right-3';
     } else if (isTablet) {
-      return {
-        right: '24px',
-        top: '24px'
-      };
-    } else if (isExtraSmall) {
-      // Extra small screens like iPhone SE
-      return {
-        right: '6px', // Even closer to the edge for tiny screens
-        top: '12px'
-      };
+      positionClasses = 'top-6 right-6';
+    } else if (isDesktop) {
+      positionClasses = 'top-6 right-12';
     } else {
-      // Mobile positioning
-      return {
-        right: '12px',
-        top: '24px'
-      };
-    }
-  };
-
-  // Get button size based on screen size
-  const getButtonSize = () => {
-    if (width <= breakpoints.xs) {
-      return {
-        width: '32px', // Smaller button for iPhone SE
-        height: '32px'
-      };
+      positionClasses = 'top-6 right-[124px]';
     }
     
-    return {
-      width: '40px',
-      height: '40px'
-    };
+    // Size classes
+    sizeClasses = isExtraSmall ? 'w-8 h-8' : 'w-10 h-10';
+    
+    return `absolute z-[5] ${positionClasses} ${sizeClasses}`;
   };
-
-  // Only calculate these values client-side to avoid hydration mismatches
-  const buttonPosition = mounted ? getSoundButtonPosition() : { top: '24px', right: '124px' };
-  const buttonSize = mounted ? getButtonSize() : { width: '40px', height: '40px' };
   
   // Icon size
   const iconSize = mounted ? (isExtraSmall ? "18" : "24") : "24";
@@ -144,11 +117,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section 
       ref={sectionRef} 
-      className="relative w-full h-screen overflow-hidden bg-black"
-      style={{
-        minHeight: '520px'
-      }}
+      className="relative w-full h-screen overflow-hidden bg-black min-h-[520px]"
     >
+      {/* Video Element */}
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover object-center"
@@ -160,10 +131,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         controls={false}
         crossOrigin="anonymous"
       >
-        <source 
-          src={videoUrl} 
-          type="video/mp4" 
-        />
+        {/* Use source with media query for mobile */}
         {mobileVideoUrl && (
           <source 
             src={mobileVideoUrl} 
@@ -171,6 +139,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             media="(max-width: 768px)"
           />
         )}
+        <source 
+          src={videoUrl} 
+          type="video/mp4" 
+        />
         Your browser does not support the video tag.
       </video>
       
@@ -187,11 +159,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Scroll Down Button - Centered at bottom */}
       <button 
         onClick={handleScrollDown}
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[3] flex flex-col items-center cursor-pointer focus:outline-none group scroll-down-btn"
+        className="absolute bottom-[5%] left-1/2 transform -translate-x-1/2 z-[3] flex flex-col items-center cursor-pointer focus:outline-none group scroll-down-btn"
         aria-label="Scroll down to content"
-        style={{
-          bottom: '5%' // Position from bottom
-        }}
       >
         <div className="animate-bounce">
           <svg width="72" height="23" viewBox="0 0 72 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -200,26 +169,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       </button>
 
-      {/* Sound Button - Absolute position in Hero section */}
-      <div 
-        className="absolute z-[5]"
-        style={{ 
-          top: buttonPosition.top,
-          right: buttonPosition.right
-        }}
-      >
-        <div 
-          style={{ 
-            width: buttonSize.width,
-            height: buttonSize.height,
-            background: '#333333',
-            borderRadius: '4px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: mounted && isExtraSmall ? '2px 1px' : '4px 2px'
-          }}
-        >
+      {/* Sound Button with dynamic Tailwind classes */}
+      <div className={mounted ? getSoundButtonClasses() : "absolute z-[5] top-6 right-[124px] w-10 h-10"}>
+        <div className={`flex justify-center items-center rounded bg-[#333333] w-full h-full ${mounted && isExtraSmall ? 'p-0.5' : 'p-1'}`}>
           <button 
             onClick={onToggleMute}
             aria-label={isMuted ? "Unmute" : "Mute"}
