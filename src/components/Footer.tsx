@@ -47,32 +47,34 @@ const Footer: React.FC = () => {
   };
 
   // Scale logo and elements based on screen size - improved for extra small screens
-  const logoWidth = mounted ? (isExtraSmall ? 60 : isTablet ? 80 : 88) : 88;
-  const logoHeight = mounted ? (isExtraSmall ? 18 : isTablet ? 24 : 27) : 27;
-  const textSize = mounted ? (isExtraSmall ? '10px' : isTablet ? '14px' : '16px') : '16px';
-  const textLineHeight = mounted ? (isExtraSmall ? '16px' : isTablet ? '20px' : '24px') : '24px';
-  const linkGap = mounted ? (isExtraSmall ? '6px' : isTablet ? '10px' : '12px') : '12px';
-  const iconScale = mounted ? (isExtraSmall ? 0.7 : isTablet ? 0.9 : 1) : 1;
-  const iconGap = mounted ? (isExtraSmall ? '8px' : isTablet ? '15px' : '18px') : '18px';
+  const logoWidth = mounted ? (isExtraSmall ? 60 : isMobile ? 70 : isTablet ? 80 : 88) : 88;
+  const logoHeight = mounted ? (isExtraSmall ? 18 : isMobile ? 21 : isTablet ? 24 : 27) : 27;
+  const textSize = mounted ? (isExtraSmall ? '10px' : isMobile ? '12px' : isTablet ? '14px' : '16px') : '16px';
+  const textLineHeight = mounted ? (isExtraSmall ? '16px' : isMobile ? '18px' : isTablet ? '20px' : '24px') : '24px';
+  const linkGap = mounted ? (isExtraSmall ? '6px' : isMobile ? '8px' : isTablet ? '10px' : '12px') : '12px';
+  const iconScale = mounted ? (isExtraSmall ? 0.7 : isMobile ? 0.8 : isTablet ? 0.9 : 1) : 1;
+  const iconGap = mounted ? (isExtraSmall ? '8px' : isMobile ? '12px' : isTablet ? '15px' : '18px') : '18px';
   
   // Calculate width to match the specs for larger screens
-  const centerSectionWidth = mounted ? (isExtraSmall ? 'auto' : isTablet ? '320px' : '387.33px') : '387.33px';
+  const centerSectionWidth = mounted ? (isExtraSmall ? 'auto' : isMobile ? '280px' : isTablet ? '320px' : '387.33px') : '387.33px';
   
-  // The gap between footer sections based on screen size
-  const footerGap = mounted ? 
-    (isExtraSmall ? '10px' : isTablet ? '80px' : isDesktop ? '150px' : '300px') : '300px';
-
   // Calculate appropriate padding based on screen size
   const getContainerPadding = () => {
-    if (isExtraSmall) return '8px 10px';
-    if (isMobile) return '12px 16px';
+    if (isExtraSmall) return '12px 10px';
+    if (isMobile) return '16px 20px';
     if (isTablet) return '20px 40px';
     if (isDesktop) return '24px 60px';
-    return '28px 80px'; // isLargeDesktop
+    return '32px 124px'; // isLargeDesktop
   };
 
   // Only get padding if mounted to avoid hydration mismatch
-  const containerPadding = mounted ? getContainerPadding() : '28px 80px';
+  const containerPadding = mounted ? getContainerPadding() : '32px 124px';
+  
+  // Calculate flex direction based on screen size
+  const flexDirection = mounted && (isExtraSmall || isMobile) ? 'column' : 'row';
+  const alignItems = mounted && (isExtraSmall || isMobile) ? 'center' : 'center';
+  const justifyContent = mounted && (isExtraSmall || isMobile) ? 'center' : 'space-between';
+  const itemsGap = mounted ? (isExtraSmall ? '16px' : isMobile ? '20px' : '0px') : '0px';
 
   return (
     <footer className="w-full bg-white flex justify-center">
@@ -82,17 +84,17 @@ const Footer: React.FC = () => {
           padding: containerPadding
         }}
       >
-        {/* Main footer container with specified flex layout */}
+        {/* Main footer container with dynamic flex layout */}
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            flexDirection: flexDirection,
+            justifyContent: justifyContent,
+            alignItems: alignItems,
             padding: '0px',
-            gap: footerGap,
-            width: isLargeDesktop ? '1192px' : '100%',
-            height: '41px',
+            gap: itemsGap,
+            width: '100%',
+            height: 'auto',
             flex: 'none',
             order: 0,
             flexGrow: 0
@@ -111,7 +113,13 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Middle section - Links and copyright */}
-          <div className="flex-1 flex justify-center items-center">
+          <div 
+            className="flex justify-center items-center"
+            style={{
+              flex: flexDirection === 'column' ? '0 0 auto' : '1',
+              order: flexDirection === 'column' ? '2' : '1'
+            }}
+          >
             <div 
               className="flex items-center flex-wrap justify-center center-links-container"
               style={{
@@ -123,10 +131,9 @@ const Footer: React.FC = () => {
                 lineHeight: textLineHeight,
                 color: '#000000',
                 width: centerSectionWidth,
-                height: '24px',
+                height: 'auto',
                 margin: '0 auto',
                 flex: 'none',
-                order: 0,
                 flexGrow: 0
               }}
             >
@@ -134,12 +141,10 @@ const Footer: React.FC = () => {
                 onClick={handlePrivacyPolicyClick}
                 className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text"
                 style={{
-                  width: isExtraSmall ? 'auto' : '124px',
-                  height: '24px',
+                  width: 'auto',
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: 400,
                   flex: 'none',
-                  order: 0,
                   flexGrow: 0,
                   display: 'flex',
                   alignItems: 'center'
@@ -151,12 +156,10 @@ const Footer: React.FC = () => {
                 onClick={handleCookieSettings}
                 className="hover:opacity-80 transition-opacity whitespace-nowrap footer-text"
                 style={{
-                  width: isExtraSmall ? 'auto' : '124px',
-                  height: '24px',
+                  width: 'auto',
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: 400,
                   flex: 'none',
-                  order: 1,
                   flexGrow: 0,
                   display: 'flex',
                   alignItems: 'center'
@@ -167,12 +170,10 @@ const Footer: React.FC = () => {
               <span 
                 className="whitespace-nowrap footer-text copyright-text"
                 style={{
-                  width: isExtraSmall ? 'auto' : '101px',
-                  height: '24px',
+                  width: 'auto',
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: 400,
                   flex: 'none',
-                  order: 2,
                   flexGrow: 0,
                   display: 'flex',
                   alignItems: 'center'
@@ -184,7 +185,13 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Right section - Social Media Icons */}
-          <div className="flex-none flex items-center" style={{ flex: '0 0 auto' }}>
+          <div 
+            className="flex items-center" 
+            style={{ 
+              flex: '0 0 auto',
+              order: flexDirection === 'column' ? '1' : '2'
+            }}
+          >
             <div 
               className="flex items-center social-icons-container"
               style={{
