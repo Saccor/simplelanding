@@ -32,8 +32,8 @@ const Footer: React.FC = () => {
   }, []);
   
   // Handle privacy policy button click
-  const handlePrivacyPolicyClick = () => {
-    console.log('Privacy Policy button clicked in Footer');
+  const handlePrivacyPolicyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     openPrivacyPolicy();
   };
   

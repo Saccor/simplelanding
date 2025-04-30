@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import PrivacyPolicyModal from './PrivacyPolicy';
 
 // Define the context type
@@ -25,15 +25,13 @@ const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState(false);
 
   // Functions to control modal state
-  const openPrivacyPolicy = () => {
-    console.log('Opening Privacy Policy Modal');
+  const openPrivacyPolicy = useCallback(() => {
     setIsPrivacyPolicyOpen(true);
-  };
+  }, []);
 
-  const closePrivacyPolicy = () => {
-    console.log('Closing Privacy Policy Modal');
+  const closePrivacyPolicy = useCallback(() => {
     setIsPrivacyPolicyOpen(false);
-  };
+  }, []);
 
   return (
     <ModalContext.Provider

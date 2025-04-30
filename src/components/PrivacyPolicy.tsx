@@ -8,8 +8,6 @@ interface PrivacyPolicyModalProps {
 }
 
 const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, onClose }) => {
-  console.log('PrivacyPolicyModal render, isOpen:', isOpen);
-  
   // Use React.useEffect to lock body scroll when modal is open
   React.useEffect(() => {
     if (isOpen) {
@@ -17,8 +15,6 @@ const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, onClose
     } else {
       document.body.classList.remove('modal-open');
     }
-    
-    console.log('PrivacyPolicyModal props changed, isOpen:', isOpen);
     
     // Cleanup function to ensure body scroll is restored
     return () => {

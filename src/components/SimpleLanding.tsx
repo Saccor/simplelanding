@@ -47,16 +47,6 @@ export default function SimpleLanding({
     return cleanup;
   }, []);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("SimpleLanding props:", {
-      videoUrl,
-      emailHeading,
-      emailSubtext,
-      emailImage
-    });
-  }, [videoUrl, emailHeading, emailSubtext, emailImage]);
-
   // Update muted state when initialMuted prop changes
   useEffect(() => {
     setIsMuted(initialMuted);

@@ -33,11 +33,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    console.log('Video URL:', videoUrl); // Debug log
     
     const handleLoadedData = () => {
-      console.log('Video loaded successfully'); // Debug log
       setIsVideoLoading(false);
       video.play().catch(error => {
         console.error('Video autoplay failed:', error);
@@ -52,16 +49,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('error', handleError as EventListener);
-    
-    // Add play event listener for debugging
-    video.addEventListener('play', () => {
-      console.log('Video playing, muted:', video.muted);
-    });
-    
-    // Add pause event listener for debugging
-    video.addEventListener('pause', () => {
-      console.log('Video paused');
-    });
     
     video.load();
 
