@@ -56,6 +56,48 @@ export default function TextSection({
       link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap';
       document.head.appendChild(link);
     }
+
+    // Add the custom CSS class
+    if (!document.getElementById('textsection-styles')) {
+      const style = document.createElement('style');
+      style.id = 'textsection-styles';
+      style.innerHTML = `
+        .textsection-line--1 {
+          /* Typography */
+          font-family: 'Poppins', sans-serif;
+          font-weight: 400;
+          font-size: 40px;
+          line-height: 60px;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
+
+          /* Color */
+          color: #192124;
+        }
+        
+        @media (max-width: 1024px) {
+          .textsection-line--1 {
+            font-size: 32px;
+            line-height: 48px;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .textsection-line--1 {
+            font-size: 24px;
+            line-height: 36px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .textsection-line--1 {
+            font-size: 18px;
+            line-height: 26px;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }, []);
 
   // Get text classes based on screen size
@@ -67,7 +109,7 @@ export default function TextSection({
     if (isExtraSmall) {
       textSize = 'text-lg';
       lineHeight = 'leading-[26px]';
-      maxWidth = 'max-w-[92%]';
+      maxWidth = 'max-w-[90%]';
     } else if (isMobile) {
       textSize = 'text-2xl';
       lineHeight = 'leading-9';
@@ -86,7 +128,7 @@ export default function TextSection({
       maxWidth = 'max-w-[618px]';
     }
     
-    return `font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-['Poppins',_sans-serif] ${textSize} ${lineHeight} ${maxWidth} mx-auto`;
+    return `textsection-line--1 ${maxWidth} mx-auto`;
   };
 
   // Get section height based on screen size
@@ -98,13 +140,13 @@ export default function TextSection({
   };
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-white overflow-x-hidden">
       <div 
         ref={containerRef} 
-        className={`w-full mx-auto flex items-center justify-center max-w-full sm:max-w-screen-lg lg:max-w-screen-xl ${mounted ? getSectionHeight() : 'h-[522px]'}`}
+        className={`w-full mx-auto flex items-center justify-center max-w-[100vw] sm:max-w-screen-lg lg:max-w-screen-xl ${mounted ? getSectionHeight() : 'h-[522px]'}`}
       >
         <div className="w-full h-full flex items-center justify-center relative" style={{ perspective: '1000px' }}>
-          <div className="relative overflow-hidden w-full px-2 flex justify-center">
+          <div className="relative overflow-hidden w-full px-1 xs:px-2 flex justify-center">
             <AnimatePresence initial={false} mode="wait">
               <motion.div
                 key={activeIndex}
@@ -115,7 +157,7 @@ export default function TextSection({
                 transition={{ duration: 0.6 }}
                 className="w-full"
               >
-                <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-[40px] leading-tight sm:leading-normal md:leading-relaxed lg:leading-[54px] xl:leading-[60px] max-w-[85%] sm:max-w-[70%] lg:max-w-[618px] mx-auto'}>
+                <p className={mounted ? getTextClasses() : 'textsection-line--1 max-w-[90%] sm:max-w-[70%] lg:max-w-[618px] mx-auto'}>
                   {textLines[activeIndex]}
                 </p>
               </motion.div>

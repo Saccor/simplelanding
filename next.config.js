@@ -16,8 +16,12 @@ const nextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'assets.example.com',
+        pathname: '**',
+      },
     ],
-    domains: ['assets.example.com', 'storage.googleapis.com'],
   },
   webpack(config) {
     config.module.rules.push({
