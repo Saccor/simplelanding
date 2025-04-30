@@ -5,7 +5,6 @@ import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
 interface TextSectionProps {
   textLines?: string[];
-  autoChangeInterval?: number;
 }
 
 export default function TextSection({
@@ -17,12 +16,13 @@ export default function TextSection({
     "IT'S A CHALLENGE TO THE INDUSTRY.",
     "IT'S A COMMITMENT TO A BETTER WAY",
     "IT'S A CALL TO EVERYONE WHO BELIEVES IN A FUTURE WHERE TECHNOLOGY WORKS FOR US—NOT AGAINST US."
-  ],
-  autoChangeInterval = 3500
+  ]
 }: TextSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  
+  // Display just the first text line
+  const activeIndex = 0;
 
   // This will help avoid hydration mismatches
   useEffect(() => {
@@ -31,17 +31,6 @@ export default function TextSection({
 
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
-
-  // Auto-cycle text effect with clean interval management
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const intervalId = setInterval(() => {
-      setActiveIndex(prev => (prev + 1) % textLines.length);
-    }, autoChangeInterval);
-    
-    return () => clearInterval(intervalId);
-  }, [mounted, textLines.length, autoChangeInterval]);
 
   useEffect(() => {
     // Add Poppins font if not already in the document
@@ -120,20 +109,6 @@ export default function TextSection({
               );
             })}
           </div>
-        </div>
-      </div>
-      
-      {/* Indicators showing progress */}
-      <div className="w-full flex justify-center mt-4">
-        <div className="flex space-x-1.5">
-          {textLines.map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex ? 'bg-[#a75c31] scale-110' : 'bg-[#D9D9D9] scale-100'
-              }`}
-            />
-          ))}
         </div>
       </div>
     </section>

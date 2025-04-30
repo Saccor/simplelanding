@@ -4,17 +4,16 @@ A modern, responsive landing page for Arfve, a company building sustainable audi
 
 ## Overview
 
-This project is a responsive landing page for Arfve, showcasing the brand's focus on sustainability and cutting-edge technology in audio devices. Built with Next.js 15 and React 19, it features a clean, modern design with a video hero section, interactive elements, and an email signup form.
+This project is a responsive landing page for Arfve, showcasing the brand's focus on sustainability and cutting-edge technology in audio devices. Built with Next.js 15 and React 19, it features a clean, modern design with a hero image section, static text content, and an email signup form.
 
 ## Features
 
 - Responsive design optimized for all device sizes (from iPhone SE to large desktops)
-- Hero section with full-screen background video
-- Interactive sound toggle for hero video
-- Scrolling text animation with automatic text transitions
+- Full-screen hero section with high-quality background image
+- Static text section with bold brand messaging
 - Email signup form with validation and success/error states
 - Clean, minimalist UI following modern design principles
-- Animated transitions and loading states
+- Privacy policy modal and cookie consent implementation
 - SEO-optimized metadata
 
 ## Technology Stack
@@ -51,6 +50,22 @@ npm start
 npm run lint
 ```
 
+## Code Organization
+
+The codebase follows a minimalist, component-based structure:
+
+### Core Principles
+- **Component-Based Architecture**: UI is divided into reusable, focused components
+- **Type Safety**: TypeScript interfaces define clear component props
+- **Responsive Design**: All components adapt to different screen sizes
+- **Performance Optimization**: Static rendering with client-side hydration
+
+### Key Design Patterns
+- **Custom Hooks**: The useWindowSize hook provides responsive breakpoint information
+- **Context API**: Used for global state like modal management
+- **Inline Styling**: Component-specific styling with inline styles and Tailwind
+- **Component Composition**: Smaller components are assembled into the page layout
+
 ## Project Structure
 
 ```
@@ -64,29 +79,29 @@ simplelanding/
 │ │
 │ ├── components/
 │ │ ├── SimpleLanding.tsx # Main container component
-│ │ ├── Header.tsx        # Site header with logo and sound toggle
-│ │ ├── HeroSection.tsx   # Video background hero section
-│ │ ├── TextSection.tsx   # Text content section with scroll animation
+│ │ ├── Header.tsx        # Site header with logo
+│ │ ├── HeroSection.tsx   # Image background hero section
+│ │ ├── TextSection.tsx   # Static text content section
 │ │ ├── EmailSection.tsx  # Email signup form section
-│ │ └── Footer.tsx        # Site footer with links
+│ │ ├── Footer.tsx        # Site footer with links
+│ │ ├── ModalProvider.tsx # Context provider for modals
+│ │ ├── PrivacyPolicy.tsx # Privacy policy modal content
+│ │ └── CookieConsent.tsx # Cookie consent banner
 │ │
 │ ├── hooks/
-│ │ ├── useWindowSize.ts  # Custom hook for responsive breakpoints
-│ │ └── useScrollObserver.ts # Custom hook for scroll animations
+│ │ └── useWindowSize.ts  # Custom hook for responsive breakpoints
 │ │
-│ └── utils/              # Utility functions
+│ └── config/             
+│    └── emailConfig.ts   # Email submission configuration
 │
 ├── public/               # Static assets
 │ ├── images/             # Image assets directory
 │ │ └── favicon.png       # Site favicon for metadata
-│ ├── HeroVideo1.mp4      # Hero section background video (large file)
 │ ├── Arfve6.jpg          # Product image for email section
 │ ├── arfve-logo.svg      # Main logo (white)
 │ ├── arfve-logo-dark.svg # Dark version of logo
-│ ├── volume-on.svg       # Sound icon for video unmuted state
-│ └── volume-off.svg      # Sound icon for video muted state
 │
-├── next.config.js        # Next.js configuration (includes video file handling)
+├── next.config.js        # Next.js configuration
 ├── tailwind.config.js    # Tailwind CSS configuration with custom breakpoints
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
@@ -97,37 +112,56 @@ simplelanding/
 ## Component Architecture
 
 ### Page Component (`src/app/page.tsx`)
-The main entry point that renders the SimpleLanding component with configurable props.
+The main entry point that renders the SimpleLanding component with configurable props:
+- Passes content props to child components
+- Provides static text content for the page
 
 ### SimpleLanding Component (`src/components/SimpleLanding.tsx`)
-The main container component that:
-- Handles video loading and playback state
-- Manages mute/unmute functionality
-- Handles email form submission
-- Arranges all sections in the proper order
+The main container component that arranges all sections in the proper order:
+- Renders Header, HeroSection, TextSection, EmailSection, and Footer
+- Passes appropriate props to each section
+- Maintains overall page structure and container
 
 ### Header Component (`src/components/Header.tsx`)
-- Displays the logo
-- Provides video sound toggle
-- Changes appearance on scroll
+- Shows the Arfve logo (light or dark version based on scroll position)
+- Changes appearance on scroll (transparent to white background)
 - Adjusts size and spacing based on device size
+- Centered layout with responsive sizing
+
+### HeroSection Component (`src/components/HeroSection.tsx`)
+- Displays full-screen background image
+- Simple, minimal design focused on visual impact
+- Responsive height adjustments for different devices
+- Subtle overlay for better text visibility when used with logo
 
 ### TextSection Component (`src/components/TextSection.tsx`)
-- Displays animated text lines that change on scroll
-- Uses scroll percentage to determine which text line to show
+- Displays static brand messaging
+- Shows the first text line from the provided array
 - Fully responsive with adjustments for screen sizes down to iPhone SE
 - Uses dynamic sizing and positioning based on viewport width
 
 ### EmailSection Component (`src/components/EmailSection.tsx`)
 - Displays product image with responsive adjustments
-- Contains email signup form
-- Handles form submission states
-- Adjusts layout for different device sizes, including specific optimizations for small screens
+- Contains email signup form in a separate EmailForm component
+- Handles form submission states and validation
+- Adjusts layout for different device sizes
+- Provides specialized optimizations for small screens
 
 ### Footer Component (`src/components/Footer.tsx`)
 - Displays logo, copyright, and policy links
-- Contains social media links
+- Contains social media links to company profiles
 - Adjusts layout for mobile screens (column vs. row layout)
+- Provides access to privacy policy modal
+
+### ModalProvider Component (`src/components/ModalProvider.tsx`)
+- Provides context for modal management across the app
+- Controls the state of privacy policy modal
+- Uses React Context API for seamless integration
+
+### CookieConsent Component (`src/components/CookieConsent.tsx`)
+- Implements GDPR-compliant cookie consent management
+- Provides granular control over cookie preferences
+- Uses a consolidated approach to preference management
 
 ## Responsive Design Approach
 
@@ -168,30 +202,9 @@ Special considerations for mobile devices:
 
 The landing page requires the following media assets:
 
-1. Hero video (`public/HeroVideo1.mp4`) - Background video for the hero section (533MB)
-2. Product image (`public/Arfve6.jpg`) - Image for the email section (17MB)
+1. Hero image - Background image for the hero section
+2. Product image (`public/Arfve6.jpg`) - Image for the email section
 3. Logo files in both light and dark versions
-4. Sound control SVG icons
-
-### Large Media Files
-
-Note that the Hero video file (`public/HeroVideo1.mp4`) is very large (533MB) and the product image (`public/Arfve6.jpg`) is 17MB. When cloning this repository, you may need to get these files separately if they're not included in the repository due to size constraints.
-
-## Custom Hooks
-
-### useWindowSize
-A responsive design hook that:
-- Detects current viewport dimensions
-- Determines device type based on breakpoints
-- Provides boolean flags for responsive conditions
-- Re-renders components when screen size changes
-
-### useScrollObserver
-A hook for scroll-based animations that:
-- Observes elements entering the viewport
-- Adds CSS classes based on visibility
-- Controls animation timing
-- Supports custom thresholds for animation triggers
 
 ## Future Development Guidelines
 
@@ -209,13 +222,12 @@ When adding new components or modifying existing ones:
 
 ### 2. Component Modifications
 When modifying existing components:
-- The `TextSection` scrolling animation is sensitive to timing - maintain the scrollPercentage calculation 
 - For `EmailSection`, preserve the specialized mobile layouts for small screens
 - Maintain the current approach of using inline styles with device-specific calculations
+- Continue extracting reusable logic to reduce component size and duplication
 
 ### 3. Performance Considerations
 For future optimizations:
-- Consider serving different sized video files for different devices
 - Implement lazy loading for below-the-fold content
 - Further optimize images with next/image quality settings
 - Consider using WebP format for image assets
@@ -225,7 +237,8 @@ When adding new page sections:
 - Follow the pattern of creating responsive styles based on device size
 - Use percentage-based widths where possible
 - Create device-specific layouts where needed
-- Maintain the z-index hierarchy (header: 4, email section: 2, text section: 1)
+- Maintain the z-index hierarchy (header: 4, content sections: 2-3)
+- Extract reusable components to maintain maintainable file sizes
 
 ### 5. API Integration
 For implementing the email signup functionality:
@@ -249,11 +262,7 @@ When making changes, test across these browsers and ensure compatibility with:
 
 1. **Email Form**: The form currently logs submissions to the console. A backend API needs to be implemented.
 
-2. **Video Loading**: On slow connections, the initial video loading can take time - consider adding a placeholder image.
-
-3. **iPhone SE Layout**: While optimized, some edge cases may still exist with extremely small screens where text might be difficult to read.
-
-4. **Scroll Animation**: The text section animation depends on scroll position and may behave differently on various browser/device combinations.
+2. **iPhone SE Layout**: While optimized, some edge cases may still exist with extremely small screens where text might be difficult to read.
 
 ## License
 
