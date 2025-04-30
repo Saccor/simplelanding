@@ -86,7 +86,7 @@ export default function TextSection({
     <section className="w-full bg-white">
       <div 
         ref={containerRef} 
-        className={`w-full mx-auto flex items-center justify-center max-w-[1440px] ${mounted ? getSectionHeight() : 'h-[522px]'}`}
+        className={`w-full mx-auto flex items-center justify-center max-w-full sm:max-w-screen-lg lg:max-w-screen-xl ${mounted ? getSectionHeight() : 'h-[522px]'}`}
       >
         <div className="w-full h-full flex items-center justify-center relative" style={{ perspective: '1000px' }}>
           <div className="relative overflow-hidden w-full px-2 flex justify-center">
@@ -102,7 +102,7 @@ export default function TextSection({
                       : 'opacity-0 translate-y-5 absolute'
                   }`}
                 >
-                  <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-[40px] leading-[60px] max-w-[618px] mx-auto'}>
+                  <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-[40px] leading-tight sm:leading-normal md:leading-relaxed lg:leading-[54px] xl:leading-[60px] max-w-[85%] sm:max-w-[70%] lg:max-w-[618px] mx-auto'}>
                     {line}
                   </p>
                 </div>
