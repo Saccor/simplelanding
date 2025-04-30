@@ -1,3 +1,9 @@
 // Email configuration
 export const EMAIL_SUBMISSION_ENABLED = true;
-export const EMAIL_SIGNUP_ENDPOINT = '/api/subscribe'; // Update with your actual endpoint 
+
+// Formspree endpoint - replace YOUR_FORM_ID with your actual Formspree form ID
+// Create yours at: https://formspree.io/forms/
+export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mnndjbrr';
+
+// Use Formspree directly instead of custom API
+export const EMAIL_SIGNUP_ENDPOINT = FORMSPREE_ENDPOINT; 

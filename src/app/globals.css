@@ -83,19 +83,61 @@ body {
 @media (max-width: 480px) {
   .footer-container {
     padding: 16px 8px !important;
-    flex-direction: column !important;
-    gap: 12px !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
   }
   
   .social-icons-container {
-    width: 100% !important;
-    justify-content: center !important;
+    width: auto !important;
+    gap: 8px !important;
   }
   
   .center-links-container {
-    width: 100% !important;
-    gap: 8px !important;
-    font-size: 12px !important;
+    width: auto !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    font-size: 10px !important;
+    line-height: 16px !important;
+  }
+  
+  /* Ensure text doesn't wrap on small screens */
+  .footer-text {
+    white-space: nowrap !important;
+    font-size: 10px !important;
+    line-height: 16px !important;
+  }
+  
+  /* Scale down social icons */
+  .footer-social-icon {
+    transform: scale(0.7) !important;
+  }
+  
+  /* Make the logo smaller on very small screens */
+  .footer-logo {
+    max-width: 60px !important;
+    height: auto !important;
+  }
+}
+
+/* Additional responsive adjustments for iPhone SE and other very small screens */
+@media (max-width: 375px) {
+  /* Further reduce footer element sizes */
+  .center-links-container {
+    gap: 4px !important;
+    font-size: 9px !important;
+  }
+  
+  .social-icons-container {
+    gap: 6px !important;
+  }
+  
+  .footer-social-icon {
+    transform: scale(0.6) !important;
+  }
+  
+  .footer-logo {
+    max-width: 50px !important;
   }
 }
 
@@ -297,12 +339,45 @@ body {
   height: 24px;
   justify-content: center;
   flex: 2;
+  font-family: 'Poppins', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
 }
 
 @media (max-width: 640px) {
   .center-links-container {
     flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 20px;
   }
+}
+
+/* Footer text styling */
+.footer-text {
+  font-family: 'Poppins', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+}
+
+/* Specific styling for copyright text */
+.center-links-container span.footer-text {
+  position: relative;
+  top: -2px; /* Slight offset to match design */
+}
+
+/* Specifically target the copyright text for alignment */
+.copyright-text {
+  display: inline-block;
+  transform: translateY(-5px);
+  vertical-align: top;
+  margin-top: -0.25em; /* Proper baseline alignment adjustment */
 }
 
 /* Modal styles */
