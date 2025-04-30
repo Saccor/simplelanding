@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import useScrollObserver from '../hooks/useScrollObserver';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 import { toast } from 'react-toastify';
 import { EMAIL_SUBMISSION_ENABLED, EMAIL_SIGNUP_ENDPOINT } from '../config/emailConfig';
@@ -12,6 +11,159 @@ interface EmailSectionProps {
   emailSubtext: string;
   emailImage: string;
 }
+
+// Extracted EmailForm component to reduce duplication
+interface EmailFormProps {
+  isClient: boolean;
+  isSubmitting: boolean;
+  isSuccess: boolean;
+  error: string;
+  email: string;
+  setEmail: (email: string) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  textSizes: {
+    descriptionSize: string;
+    descriptionLineHeight: string;
+    formGap: string;
+    formPadding: string;
+  };
+  isExtraSmall: boolean;
+}
+
+const EmailForm: React.FC<EmailFormProps> = ({
+  isClient,
+  isSubmitting,
+  isSuccess,
+  error,
+  email,
+  setEmail,
+  handleSubmit,
+  textSizes,
+  isExtraSmall
+}) => {
+  return (
+    <>
+      <p 
+        style={{
+          fontFamily: "'Poppins', sans-serif",
+          fontStyle: 'normal',
+          fontWeight: 400,
+          fontSize: textSizes.descriptionSize,
+          lineHeight: textSizes.descriptionLineHeight,
+          color: '#192124',
+          width: '100%'
+        }}
+      >
+        Sign up with your email address, pay €1 to get our best opening offer
+      </p>
+
+      <form 
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          flexDirection: isExtraSmall ? 'column' : 'row',
+          alignItems: isExtraSmall ? 'stretch' : 'center',
+          padding: '0px',
+          gap: isExtraSmall ? '10px' : '12px',
+          width: '100%',
+          height: 'auto'
+        }}
+      >
+        {!EMAIL_SUBMISSION_ENABLED ? (
+          <p style={{ color: '#DC2626', fontSize: '14px' }}>
+            Email submission is currently disabled.
+          </p>
+        ) : (
+          <>
+            <input
+              type="email"
+              id="email-mobile"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email"
+              required
+              style={{
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                gap: '10px',
+                height: isExtraSmall ? '40px' : '44px',
+                background: '#FFFFFF',
+                border: '1px solid rgba(0, 0, 0, 0.48)',
+                borderRadius: '28px',
+                fontFamily: "'Poppins', sans-serif",
+                fontStyle: 'normal',
+                fontWeight: 400,
+                fontSize: isExtraSmall ? '12px' : '14px',
+                lineHeight: isExtraSmall ? '18px' : '20px',
+                textAlign: 'center',
+                color: '#000000',
+                flex: isExtraSmall ? 'none' : 1
+              }}
+              autoComplete="email"
+            />
+            
+            <input type="hidden" name="source" value="website_signup" />
+            <input type="hidden" name="signup_date" value={new Date().toISOString()} />
+            
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                gap: '10px',
+                width: isExtraSmall ? '100%' : '98px',
+                height: isExtraSmall ? '40px' : '44px',
+                background: '#B4694A',
+                borderRadius: '55px',
+                fontFamily: "'Poppins', sans-serif",
+                fontStyle: 'normal',
+                fontWeight: 500,
+                fontSize: isExtraSmall ? '12px' : '14px',
+                lineHeight: isExtraSmall ? '18px' : '20px',
+                textAlign: 'center',
+                color: '#FFFFFF',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {isSubmitting ? 'Sending...' : 'Sign-up'}
+            </button>
+          </>
+        )}
+      </form>
+      
+      {/* Success/Error Messages */}
+      {isClient && isSuccess && (
+        <p style={{ 
+          marginTop: '8px', 
+          color: '#059669',
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: isExtraSmall ? '12px' : '14px'
+        }}>
+          Thank you for signing up!
+        </p>
+      )}
+      {isClient && error && (
+        <p style={{ 
+          marginTop: '8px', 
+          color: '#DC2626',
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: isExtraSmall ? '12px' : '14px'
+        }}>
+          {error}
+        </p>
+      )}
+    </>
+  );
+};
 
 const EmailSection: React.FC<EmailSectionProps> = ({ 
   emailHeading, 
@@ -49,12 +201,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     }
   }, []);
   
-  // Use scroll observers
-  useScrollObserver({ ref: headingRef });
-  useScrollObserver({ ref: subtextRef, threshold: 0.2 });
-  useScrollObserver({ ref: descriptionRef, threshold: 0.2 });
-  useScrollObserver({ ref: formRef, threshold: 0.3 });
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -294,7 +440,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               >
                 <h2 
                   ref={headingRef}
-                  className="scroll-reveal"
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -315,7 +460,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 
                 <p 
                   ref={subtextRef}
-                  className="scroll-reveal delay-200"
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -338,7 +482,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               {/* Form Container */}
               <div
                 ref={formRef}
-                className="scroll-reveal delay-300"
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -355,141 +498,17 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   flexGrow: 0
                 }}
               >
-                <p 
-                  ref={descriptionRef}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    fontSize: '18px',
-                    lineHeight: '28px',
-                    color: '#192124',
-                    flex: 'none',
-                    order: 0,
-                    alignSelf: 'stretch',
-                    flexGrow: 0
-                  }}
-                >
-                  Sign up with your email address, pay €1 to get our best opening offer
-                </p>
-                
-                {/* Form with Formspree integration */}
-                <form 
-                  onSubmit={handleSubmit}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    padding: '0px',
-                    gap: '12px',
-                    width: '100%',
-                    height: '44px',
-                    flex: 'none',
-                    order: 1,
-                    alignSelf: 'stretch',
-                    flexGrow: 0
-                  }}
-                >
-                  {!EMAIL_SUBMISSION_ENABLED ? (
-                    <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                      Email submission is currently disabled.
-                    </p>
-                  ) : (
-                    <>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email" // Important: Formspree uses the name attribute
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email"
-                        required // Add required attribute for HTML5 validation
-                        style={{
-                          boxSizing: 'border-box',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          padding: '10px 20px',
-                          gap: '10px',
-                          height: '44px',
-                          background: '#FFFFFF',
-                          border: '1px solid rgba(0, 0, 0, 0.48)',
-                          borderRadius: '28px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 400,
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          textAlign: 'center',
-                          color: '#000000',
-                          flex: 'none',
-                          order: 0,
-                          flexGrow: 1
-                        }}
-                        autoComplete="email"
-                      />
-                      
-                      {/* Hidden fields for additional data */}
-                      <input type="hidden" name="source" value="website_signup" />
-                      <input type="hidden" name="signup_date" value={new Date().toISOString()} />
-                      
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '10px 20px',
-                          gap: '10px',
-                          width: '98px',
-                          height: '44px',
-                          background: '#B4694A',
-                          borderRadius: '55px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 500,
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          textAlign: 'center',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          flex: 'none',
-                          order: 1,
-                          flexGrow: 0,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {isSubmitting ? 'Sending...' : 'Sign-up'}
-                      </button>
-                    </>
-                  )}
-                </form>
-                
-                {/* Success/Error Messages */}
-                {isClient && isSuccess && (
-                  <p style={{ 
-                    marginTop: '8px', 
-                    color: '#059669',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: '14px'
-                  }}>
-                    Thank you for signing up!
-                  </p>
-                )}
-                {isClient && error && (
-                  <p style={{ 
-                    marginTop: '8px', 
-                    color: '#DC2626',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: '14px'
-                  }}>
-                    {error}
-                  </p>
-                )}
+                <EmailForm
+                  isClient={isClient}
+                  isSubmitting={isSubmitting}
+                  isSuccess={isSuccess}
+                  error={error}
+                  email={email}
+                  setEmail={setEmail}
+                  handleSubmit={handleSubmit}
+                  textSizes={textSizes}
+                  isExtraSmall={isExtraSmall}
+                />
               </div>
             </div>
           </>
@@ -546,8 +565,9 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               >
                 <h2 
                   ref={headingRef}
-                  className="scroll-reveal"
                   style={{
+                    width: '100%',
+                    height: 'auto',
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'normal',
                     fontWeight: 600,
@@ -562,7 +582,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 
                 <p 
                   ref={subtextRef}
-                  className="scroll-reveal delay-200"
                   style={{
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'normal',
@@ -579,7 +598,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
               {/* Form Container */}
               <div
                 ref={formRef}
-                className="scroll-reveal delay-300 w-full"
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -592,127 +610,17 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   margin: isTablet || isIpad || isDesktop ? '0 auto' : '0'
                 }}
               >
-                <p 
-                  ref={descriptionRef}
-                  style={{
-                    fontFamily: "'Poppins', sans-serif",
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    fontSize: textSizes.descriptionSize,
-                    lineHeight: textSizes.descriptionLineHeight,
-                    color: '#192124',
-                    width: '100%'
-                  }}
-                >
-                  Sign up with your email address, pay €1 to get our best opening offer
-                </p>
-
-                {/* Form with Formspree integration - Mobile/Tablet */}
-                <form 
-                  onSubmit={handleSubmit}
-                  style={{
-                    display: 'flex',
-                    flexDirection: isExtraSmall ? 'column' : 'row',
-                    alignItems: isExtraSmall ? 'stretch' : 'center',
-                    padding: '0px',
-                    gap: isExtraSmall ? '10px' : '12px',
-                    width: '100%',
-                    height: 'auto'
-                  }}
-                >
-                  {!EMAIL_SUBMISSION_ENABLED ? (
-                    <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                      Email submission is currently disabled.
-                    </p>
-                  ) : (
-                    <>
-                      <input
-                        type="email"
-                        id="email-mobile"
-                        name="email" // Important: Formspree uses the name attribute
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email"
-                        required // Add required attribute for HTML5 validation
-                        style={{
-                          boxSizing: 'border-box',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                          gap: '10px',
-                          height: isExtraSmall ? '40px' : '44px',
-                          background: '#FFFFFF',
-                          border: '1px solid rgba(0, 0, 0, 0.48)',
-                          borderRadius: '28px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 400,
-                          fontSize: isExtraSmall ? '12px' : '14px',
-                          lineHeight: isExtraSmall ? '18px' : '20px',
-                          textAlign: 'center',
-                          color: '#000000',
-                          flex: isExtraSmall ? 'none' : 1
-                        }}
-                        autoComplete="email"
-                      />
-                      
-                      {/* Hidden fields for additional data */}
-                      <input type="hidden" name="source" value="website_signup" />
-                      <input type="hidden" name="signup_date" value={new Date().toISOString()} />
-                      
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                          gap: '10px',
-                          width: isExtraSmall ? '100%' : '98px',
-                          height: isExtraSmall ? '40px' : '44px',
-                          background: '#B4694A',
-                          borderRadius: '55px',
-                          fontFamily: "'Poppins', sans-serif",
-                          fontStyle: 'normal',
-                          fontWeight: 500,
-                          fontSize: isExtraSmall ? '12px' : '14px',
-                          lineHeight: isExtraSmall ? '18px' : '20px',
-                          textAlign: 'center',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {isSubmitting ? 'Sending...' : 'Sign-up'}
-                      </button>
-                    </>
-                  )}
-                </form>
-                
-                {/* Success/Error Messages */}
-                {isClient && isSuccess && (
-                  <p style={{ 
-                    marginTop: '8px', 
-                    color: '#059669',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: isExtraSmall ? '12px' : '14px'
-                  }}>
-                    Thank you for signing up!
-                  </p>
-                )}
-                {isClient && error && (
-                  <p style={{ 
-                    marginTop: '8px', 
-                    color: '#DC2626',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: isExtraSmall ? '12px' : '14px'
-                  }}>
-                    {error}
-                  </p>
-                )}
+                <EmailForm
+                  isClient={isClient}
+                  isSubmitting={isSubmitting}
+                  isSuccess={isSuccess}
+                  error={error}
+                  email={email}
+                  setEmail={setEmail}
+                  handleSubmit={handleSubmit}
+                  textSizes={textSizes}
+                  isExtraSmall={isExtraSmall}
+                />
               </div>
             </div>
           </div>

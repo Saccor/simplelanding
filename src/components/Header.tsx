@@ -4,12 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
 
-interface HeaderProps {
-  isMuted: boolean;
-  onToggleMute: () => void;
-}
+interface HeaderProps {}
 
-const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
+const Header: React.FC<HeaderProps> = () => {
   const [inHeroSection, setInHeroSection] = useState(true);
   const [mounted, setMounted] = useState(false);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();

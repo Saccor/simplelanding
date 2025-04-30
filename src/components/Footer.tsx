@@ -42,6 +42,7 @@ const Footer: React.FC = () => {
             alt="Arfve"
             width={88}
             height={27}
+            priority
             className="h-auto w-auto"
           />
         </div>

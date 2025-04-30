@@ -10,6 +10,9 @@ interface CookieOptions {
   marketing: boolean;
 }
 
+// Cookie preference levels
+type PreferenceLevel = 'necessary' | 'analytics' | 'marketing' | 'all' | 'none' | 'selected';
+
 const CookieConsentBanner: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [cookieOptions, setCookieOptions] = useState<CookieOptions>({
@@ -27,93 +30,49 @@ const CookieConsentBanner: React.FC = () => {
     });
   };
 
-  // Accept selected cookies
-  const acceptSelected = () => {
-    // Store cookie preferences
-    Cookies.set('cookieConsent', JSON.stringify(cookieOptions), { expires: 365 });
-    
-    // Apply cookie settings
-    if (cookieOptions.analytics) {
-      // Enable analytics cookies (placeholder)
-    }
-    if (cookieOptions.marketing) {
-      // Enable marketing cookies (placeholder)
-    }
-    
-    setShowSettings(false);
-  };
-
-  // Accept all cookies
-  const acceptAll = () => {
-    const allOptions = {
-      necessary: true,
-      analytics: true,
-      marketing: true,
-    };
-    
-    // Store cookie preferences
-    Cookies.set('cookieConsent', JSON.stringify(allOptions), { expires: 365 });
-    
-    setShowSettings(false);
-  };
-
-  // Decline all optional cookies
-  const declineAll = () => {
-    const minimalOptions = {
-      necessary: true,
+  // Consolidated function to handle cookie preferences
+  const savePreferences = (level: PreferenceLevel) => {
+    let options: CookieOptions = {
+      necessary: true, // Always needed
       analytics: false,
       marketing: false,
     };
-    
+
+    // Set options based on preference level
+    switch (level) {
+      case 'all':
+        options.analytics = true;
+        options.marketing = true;
+        break;
+      case 'analytics':
+        options.analytics = true;
+        break;
+      case 'marketing':
+        options.analytics = true; // Analytics included with marketing
+        options.marketing = true;
+        break;
+      case 'none':
+        // Default is already set to minimal
+        break;
+      default:
+        // Use current selections for 'selected' option
+        options = { ...cookieOptions };
+    }
+
     // Store cookie preferences
-    Cookies.set('cookieConsent', JSON.stringify(minimalOptions), { expires: 365 });
+    Cookies.set('cookieConsent', JSON.stringify(options), { expires: 365 });
     
+    // Apply settings based on options
+    // Implementation for analytics/marketing would go here
+    
+    // Update state and close settings
+    setCookieOptions(options);
     setShowSettings(false);
   };
 
   // Toggle settings panel
   const toggleSettings = () => {
     setShowSettings(!showSettings);
-  };
-
-  const handleAcceptAnalytics = () => {
-    setCookieOptions({
-      ...cookieOptions,
-      analytics: true,
-      marketing: false,
-    });
-    setShowSettings(false);
-    acceptSelected();
-  };
-
-  const handleAcceptMarketing = () => {
-    setCookieOptions({
-      ...cookieOptions,
-      analytics: true,
-      marketing: true,
-    });
-    setShowSettings(false);
-    acceptSelected();
-  };
-
-  const handleAcceptAll = () => {
-    setCookieOptions({
-      ...cookieOptions,
-      analytics: true,
-      marketing: true,
-    });
-    setShowSettings(false);
-    acceptSelected();
-  };
-
-  const handleRejectAll = () => {
-    setCookieOptions({
-      ...cookieOptions,
-      analytics: false,
-      marketing: false,
-    });
-    setShowSettings(false);
-    acceptSelected();
   };
 
   return (
@@ -147,8 +106,8 @@ const CookieConsentBanner: React.FC = () => {
           border: "1px solid white",
         }}
         enableDeclineButton
-        onAccept={acceptAll}
-        onDecline={declineAll}
+        onAccept={() => savePreferences('all')}
+        onDecline={() => savePreferences('none')}
         expires={365}
       >
         <div style={{ marginBottom: "10px" }}>
@@ -233,7 +192,7 @@ const CookieConsentBanner: React.FC = () => {
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
               <button
-                onClick={acceptSelected}
+                onClick={() => savePreferences('selected')}
                 style={{
                   background: "#a75c31",
                   color: "white",
