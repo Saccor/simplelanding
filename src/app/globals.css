@@ -50,6 +50,17 @@ body {
   height: 100px !important;
 }
 
+/* Make sure the footer layout isn't affected by any global styles */
+#footer-section .justify-between {
+  justify-content: space-between !important;
+}
+
+/* Specifically target the desktop footer layout */
+.footer-desktop-layout {
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
 /* Navigation spacing */
 .main-nav-links {
   gap: 41px;

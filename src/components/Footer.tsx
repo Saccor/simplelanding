@@ -143,7 +143,7 @@ export default function Footer() {
           ) : (
             <div className="flex flex-col items-center px-6 sm:px-10 md:px-14 lg:px-20 xl:px-24 2xl:px-[124px] pt-[32px] pb-[24px] gap-[32px] w-full max-w-full overflow-x-auto h-[100px] mx-auto">
               <div className="
-                  flex flex-row justify-between items-center
+                  flex flex-row justify-between items-center footer-desktop-layout
                   w-full max-w-[1192px] h-[41px]
                   gap-[50px] sm:gap-[70px] md:gap-[90px] lg:gap-[120px] xl:gap-[180px] 2xl:gap-[300px]
                 ">
@@ -168,8 +168,8 @@ export default function Footer() {
                   <span className="whitespace-nowrap">© 2025 Arfve</span>
                 </div>
 
-                {/* Social icons */}
-                <div className="flex items-center gap-[8px] sm:gap-[10px] md:gap-[12px] lg:gap-[15px] xl:gap-[20px] pr-2 sm:pr-0">
+                {/* Social icons - added flex-shrink-0 */}
+                <div className="flex items-center gap-[8px] sm:gap-[10px] md:gap-[12px] lg:gap-[15px] xl:gap-[20px] pr-2 sm:pr-0 flex-shrink-0">
                   <Link href="https://www.youtube.com/@arfve" target="_blank" rel="noopener" className="hover:opacity-80">
                     {/* YouTube SVG */}
                     <svg width={iconSize} height={Math.floor(iconSize * 0.7)} viewBox="0 0 30 21" fill="none">

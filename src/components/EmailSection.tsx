@@ -207,6 +207,10 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     setError('');
 
     try {
+      // Determine if we're using internal API, direct MailerLite API, or Formspree
+      const isInternalAPI = EMAIL_SIGNUP_ENDPOINT.startsWith('/api');
+      const isMailerLite = EMAIL_SIGNUP_ENDPOINT.includes('mailerlite');
+      
       const response = await fetch(EMAIL_SIGNUP_ENDPOINT, {
         method: 'POST',
         body: JSON.stringify({ email }),
@@ -224,9 +228,20 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         toast.success('Thank you for signing up!');
         setIsSubmitting(false);
       } else {
-        throw new Error(data.error || 'Something went wrong');
+        // Handle different error formats from different endpoints
+        let errorMessage = 'Something went wrong';
+        
+        if (isInternalAPI || isMailerLite) {
+          errorMessage = data.message || errorMessage;
+        } else {
+          // Formspree format
+          errorMessage = data.error || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
     } catch (err) {
+      console.error('Form submission error:', err);
       setError('Failed to submit. Please try again.');
       setIsSubmitting(false);
     }
