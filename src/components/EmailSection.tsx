@@ -62,35 +62,37 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Submitting email via API endpoint...');
+        console.log('Submitting email to Formspree...');
       }
       
-      const userData = { 
+      // Prepare data for Formspree
+      // Note: Formspree accepts form data directly with the email as a field
+      const formData = {
         email,
-        fields: {
-          source: 'website_signup',
-          signup_date: new Date().toISOString()
-        }
+        source: 'website_signup',
+        signup_date: new Date().toISOString()
       };
       
-      // Call our API endpoint
+      // Call Formspree endpoint directly
       const response = await fetch(EMAIL_SIGNUP_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(formData),
       });
       
+      // Formspree returns a 200 status for successful submissions
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || errorData.details || 'Failed to subscribe');
+        throw new Error(errorData.error || 'Failed to subscribe');
       }
       
       const data = await response.json();
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Successfully added subscriber via API:', data);
+        console.log('Successfully submitted to Formspree:', data);
       }
       
       setFormState('success');
@@ -201,9 +203,10 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       }}
     >
       <div 
-        className="w-full max-w-[1440px] relative"
+        className="w-full relative mx-auto"
         style={{
-          height: useDesktopLayout ? '650px' : 'auto'
+          height: useDesktopLayout ? '650px' : 'auto',
+          maxWidth: '1440px'
         }}
       >
         {/* For Desktop: Absolute positioned elements */}
@@ -242,13 +245,14 @@ const EmailSection: React.FC<EmailSectionProps> = ({
             <div
               style={{
                 position: 'absolute',
-                left: isLargeDesktop ? '653.99px' : width > 1200 ? '610px' : '580px',
+                width: '607px',
+                height: '354px',
+                left: '653.99px',
                 top: '135.5px',
-                width: isLargeDesktop ? '607px' : '580px',
-                zIndex: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
+                padding: '0px',
                 gap: '42px'
               }}
             >
@@ -259,20 +263,31 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   flexDirection: 'column',
                   alignItems: 'flex-start',
                   padding: '0px',
-                  gap: textSizes.gap,
-                  width: '100%'
+                  gap: '28px',
+                  width: '607px',
+                  height: '142px',
+                  flex: 'none',
+                  order: 0,
+                  alignSelf: 'stretch',
+                  flexGrow: 0
                 }}
               >
                 <h2 
                   ref={headingRef}
                   className="scroll-reveal"
                   style={{
+                    width: '607px',
+                    height: '76px',
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'normal',
                     fontWeight: 600,
-                    fontSize: textSizes.headingSize,
-                    lineHeight: textSizes.headingLineHeight,
-                    color: '#192124'
+                    fontSize: '30px',
+                    lineHeight: '38px',
+                    color: '#192124',
+                    flex: 'none',
+                    order: 0,
+                    alignSelf: 'stretch',
+                    flexGrow: 0
                   }}
                 >
                   {emailHeading}
@@ -282,12 +297,18 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   ref={subtextRef}
                   className="scroll-reveal delay-200"
                   style={{
+                    width: '607px',
+                    height: '38px',
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'normal',
                     fontWeight: 600,
-                    fontSize: textSizes.headingSize,
-                    lineHeight: textSizes.headingLineHeight,
-                    color: '#192124'
+                    fontSize: '30px',
+                    lineHeight: '38px',
+                    color: '#192124',
+                    flex: 'none',
+                    order: 1,
+                    alignSelf: 'stretch',
+                    flexGrow: 0
                   }}
                 >
                   {emailSubtext}
@@ -302,38 +323,52 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  padding: textSizes.formPadding,
-                  gap: textSizes.formGap,
+                  padding: '20px 0px',
+                  gap: '30px',
                   width: '421.79px',
+                  height: '170px',
                   filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-                  borderRadius: '20px'
+                  borderRadius: '20px',
+                  flex: 'none',
+                  order: 1,
+                  flexGrow: 0
                 }}
               >
                 <p 
                   ref={descriptionRef}
                   style={{
+                    width: '421.79px',
+                    height: '56px',
                     fontFamily: "'Poppins', sans-serif",
                     fontStyle: 'normal',
                     fontWeight: 400,
-                    fontSize: textSizes.descriptionSize,
-                    lineHeight: textSizes.descriptionLineHeight,
+                    fontSize: '18px',
+                    lineHeight: '28px',
                     color: '#192124',
-                    width: '100%'
+                    flex: 'none',
+                    order: 0,
+                    alignSelf: 'stretch',
+                    flexGrow: 0
                   }}
                 >
                   Sign up with your email address, pay €1 to get our best opening offer
                 </p>
                 
-                {/* Custom form with API integration */}
-                <div 
+                {/* Form with Formspree integration */}
+                <form 
+                  onSubmit={handleSubmit}
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
                     padding: '0px',
                     gap: '12px',
-                    width: '100%',
-                    height: '44px'
+                    width: '421.79px',
+                    height: '44px',
+                    flex: 'none',
+                    order: 1,
+                    alignSelf: 'stretch',
+                    flexGrow: 0
                   }}
                 >
                   {!EMAIL_SUBMISSION_ENABLED ? (
@@ -345,10 +380,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                       <input
                         type="email"
                         id="email"
-                        name="email"
+                        name="email" // Important: Formspree uses the name attribute
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="email"
+                        required // Add required attribute for HTML5 validation
                         style={{
                           boxSizing: 'border-box',
                           display: 'flex',
@@ -368,13 +404,19 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                           lineHeight: '20px',
                           textAlign: 'center',
                           color: '#000000',
-                          flex: 1
+                          flex: 'none',
+                          order: 0,
+                          flexGrow: 1
                         }}
                         autoComplete="email"
                       />
                       
+                      {/* Hidden fields for additional data */}
+                      <input type="hidden" name="source" value="website_signup" />
+                      <input type="hidden" name="signup_date" value={new Date().toISOString()} />
+                      
                       <button
-                        onClick={handleSubmit}
+                        type="submit"
                         disabled={isSubmitting}
                         style={{
                           display: 'flex',
@@ -395,14 +437,17 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                           textAlign: 'center',
                           color: '#FFFFFF',
                           border: 'none',
+                          flex: 'none',
+                          order: 1,
+                          flexGrow: 0,
                           cursor: 'pointer'
                         }}
                       >
-                        Sign-up
+                        {isSubmitting ? 'Sending...' : 'Sign-up'}
                       </button>
                     </>
                   )}
-                </div>
+                </form>
                 
                 {/* Success/Error Messages */}
                 {isClient && formState === 'success' && (
@@ -539,8 +584,9 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   Sign up with your email address, pay €1 to get our best opening offer
                 </p>
 
-                {/* Custom form with API integration */}
-                <div 
+                {/* Form with Formspree integration - Mobile */}
+                <form 
+                  onSubmit={handleSubmit}
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -560,10 +606,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                       <input
                         type="email"
                         id="email-mobile"
-                        name="email"
+                        name="email" // Important: Formspree uses the name attribute
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="email"
+                        required // Add required attribute for HTML5 validation
                         style={{
                           boxSizing: 'border-box',
                           display: 'flex',
@@ -587,8 +634,12 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                         autoComplete="email"
                       />
                       
+                      {/* Hidden fields for additional data */}
+                      <input type="hidden" name="source" value="website_signup" />
+                      <input type="hidden" name="signup_date" value={new Date().toISOString()} />
+                      
                       <button
-                        onClick={handleSubmit}
+                        type="submit"
                         disabled={isSubmitting}
                         style={{
                           display: 'flex',
@@ -612,11 +663,11 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                           cursor: 'pointer'
                         }}
                       >
-                        Sign-up
+                        {isSubmitting ? 'Sending...' : 'Sign-up'}
                       </button>
                     </>
                   )}
-                </div>
+                </form>
                 
                 {/* Success/Error Messages */}
                 {isClient && formState === 'success' && (
