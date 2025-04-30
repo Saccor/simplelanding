@@ -45,11 +45,10 @@ body {
   max-width: 100%;
 }
 
-/* Remove hard-coded footer dimensions that break responsiveness */
-/* #footer-section > div {
-  width: 1440px !important;
+/* Fixed footer height while making width responsive */
+#footer-section > div {
   height: 100px !important;
-} */
+}
 
 /* Navigation spacing */
 .main-nav-links {
