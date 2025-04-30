@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import CookieConsentBanner from "@/components/CookieConsent";
 import ModalProvider from "@/components/ModalProvider";
-import MailerLiteHeadScript from "@/components/MailerLiteHeadScript";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,13 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <MailerLiteHeadScript />
-      </head>
       <body className={inter.className}>
         <ModalProvider>
           {children}
           <CookieConsentBanner />
+          <ToastContainer position="bottom-right" />
         </ModalProvider>
       </body>
     </html>
