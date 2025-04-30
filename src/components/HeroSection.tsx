@@ -21,6 +21,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     setMounted(true);
   }, []);
 
+  // Get image height based on screen size
+  const getImageHeight = () => {
+    if (isExtraSmall) return 'clamp(280px, 60vh, 600px)';
+    if (isMobile) return 'clamp(350px, 65vh, 650px)';
+    if (isTablet) return 'clamp(400px, 70vh, 700px)';
+    return 'clamp(450px, 75vh, 800px)';
+  };
+
   return (
     <section ref={sectionRef} className="relative w-full overflow-hidden bg-black">
       {isExtraSmall && mounted && (
@@ -28,7 +36,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       )}
       <div 
         className="relative w-full" 
-        style={{ height: 'clamp(220px, 50vh, 400px)' }}
+        style={{ height: mounted ? getImageHeight() : 'clamp(450px, 75vh, 800px)' }}
       >
         <Image
           src={imageUrl}
