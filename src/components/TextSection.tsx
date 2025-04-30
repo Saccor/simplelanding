@@ -29,7 +29,7 @@ export default function TextSection({
     setMounted(true);
   }, []);
 
-  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
 
   // Auto-cycle text effect with clean interval management
@@ -54,98 +54,66 @@ export default function TextSection({
     }
   }, []);
 
-  // Calculate positioning based on screen size
-  const getTextPosition = () => {
-    if (isLargeDesktop) {
-      return {
-        width: '618px',
-        fontSize: '40px',
-        lineHeight: '60px',
-      };
-    } else if (isDesktop) {
-      const textWidth = Math.min(618, width * 0.6);
-      return {
-        width: `${textWidth}px`,
-        fontSize: '36px',
-        lineHeight: '54px',
-      };
+  // Get text classes based on screen size
+  const getTextClasses = () => {
+    let textSize = '';
+    let lineHeight = '';
+    let maxWidth = '';
+    
+    if (isExtraSmall) {
+      textSize = 'text-lg';
+      lineHeight = 'leading-[26px]';
+      maxWidth = 'max-w-[92%]';
+    } else if (isMobile) {
+      textSize = 'text-2xl';
+      lineHeight = 'leading-9';
+      maxWidth = 'max-w-[85%]';
     } else if (isTablet) {
-      const textWidth = width * 0.7;
-      return {
-        width: `${textWidth}px`,
-        fontSize: '32px',
-        lineHeight: '48px',
-      };
-    } else if (isExtraSmall) {
-      const textWidth = width * 0.92;
-      return {
-        width: `${textWidth}px`,
-        fontSize: '18px',
-        lineHeight: '26px',
-      };
+      textSize = 'text-3xl';
+      lineHeight = 'leading-[48px]';
+      maxWidth = 'max-w-[70%]';
+    } else if (isDesktop) {
+      textSize = 'text-4xl';
+      lineHeight = 'leading-[54px]';
+      maxWidth = 'max-w-[618px]';
     } else {
-      const textWidth = width * 0.85;
-      return {
-        width: `${textWidth}px`,
-        fontSize: '24px',
-        lineHeight: '36px',
-      };
+      textSize = 'text-[40px]';
+      lineHeight = 'leading-[60px]';
+      maxWidth = 'max-w-[618px]';
     }
+    
+    return `font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-['Poppins',_sans-serif] ${textSize} ${lineHeight} ${maxWidth}`;
   };
 
-  const textPosition = mounted ? getTextPosition() : { 
-    width: '618px', 
-    fontSize: '40px', 
-    lineHeight: '60px',
-  };
-
+  // Get section height based on screen size
   const getSectionHeight = () => {
-    if (isExtraSmall) return '340px';
-    if (isMobile) return '400px';
-    if (isTablet) return '450px';
-    return '522px';
+    if (isExtraSmall) return 'h-[340px]';
+    if (isMobile) return 'h-[400px]';
+    if (isTablet) return 'h-[450px]';
+    return 'h-[522px]';
   };
-
-  const sectionHeight = mounted ? getSectionHeight() : '522px';
 
   return (
     <section className="w-full bg-white">
       <div 
         ref={containerRef} 
-        className="w-full mx-auto flex items-center justify-center max-w-[1440px]"
-        style={{ height: sectionHeight }}
+        className={`w-full mx-auto flex items-center justify-center max-w-[1440px] ${mounted ? getSectionHeight() : 'h-[522px]'}`}
       >
-        <div 
-          className="w-full h-full flex items-center justify-center relative"
-          style={{ perspective: '1000px' }}
-        >
-          <div className="relative overflow-hidden" style={{ width: textPosition.width }}>
+        <div className="w-full h-full flex items-center justify-center relative" style={{ perspective: '1000px' }}>
+          <div className="relative overflow-hidden w-full px-2">
             {textLines.map((line, i) => {
               const isActive = i === activeIndex;
               
               return (
                 <div
                   key={i}
-                  className="absolute top-0 left-0 w-full"
-                  style={{
-                    opacity: isActive ? 1 : 0,
-                    transform: `translate3d(0, ${isActive ? 0 : 20}px, 0)`,
-                    transition: 'opacity 700ms ease-out, transform 700ms ease-out',
-                    pointerEvents: 'none',
-                    position: isActive ? 'relative' : 'absolute',
-                  }}
+                  className={`absolute top-0 left-0 w-full transition-all duration-700 ease-out ${
+                    isActive 
+                      ? 'opacity-100 translate-y-0 relative' 
+                      : 'opacity-0 translate-y-5 absolute'
+                  }`}
                 >
-                  <p
-                    className="font-normal text-center tracking-[-0.02em] text-[#192124] uppercase"
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: textPosition.fontSize,
-                      lineHeight: textPosition.lineHeight,
-                      maxWidth: '100%',
-                      padding: mounted && isExtraSmall ? '0 4px' : '0',
-                      wordBreak: mounted && isExtraSmall ? 'break-word' : 'normal'
-                    }}
-                  >
+                  <p className={mounted ? getTextClasses() : 'font-normal text-center tracking-[-0.02em] text-[#192124] uppercase font-[\'Poppins\',_sans-serif] text-[40px] leading-[60px] max-w-[618px]'}>
                     {line}
                   </p>
                 </div>
@@ -155,17 +123,15 @@ export default function TextSection({
         </div>
       </div>
       
-      {/* Optional subtle indicators showing progress */}
+      {/* Indicators showing progress */}
       <div className="w-full flex justify-center mt-4">
         <div className="flex space-x-1.5">
           {textLines.map((_, i) => (
             <div 
               key={i} 
-              className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-              style={{ 
-                background: i === activeIndex ? '#a75c31' : '#D9D9D9',
-                transform: i === activeIndex ? 'scale(1.2)' : 'scale(1)'
-              }}
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                i === activeIndex ? 'bg-[#a75c31] scale-110' : 'bg-[#D9D9D9] scale-100'
+              }`}
             />
           ))}
         </div>

@@ -12,7 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
   const [inHeroSection, setInHeroSection] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const { width, isMobile, isTablet, isDesktop, isLargeDesktop, breakpoint } = useWindowSize();
   const isExtraSmall = width <= breakpoints.xs;
 
   // This helps avoid hydration mismatches
@@ -46,24 +46,31 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
     };
   }, [inHeroSection]);
 
-  // Get padding based on screen size
-  const getHeaderPadding = () => {
-    if (width <= breakpoints.xs) {
-      // Extra small screens like iPhone SE
-      return '12px 6px'; // Reduced padding for tiny screens
+  // Get header classes based on screen size
+  const getHeaderClasses = () => {
+    let paddingClasses = '';
+    let heightClass = '';
+    
+    // Padding based on screen size
+    if (isExtraSmall) {
+      paddingClasses = 'px-1.5 py-3';
+      heightClass = 'h-[60px]';
     } else if (isMobile) {
-      return '24px 12px';
+      paddingClasses = 'px-3 py-6';
+      heightClass = 'h-[70px]';
     } else if (isTablet) {
-      return '32px 24px';
+      paddingClasses = 'px-6 py-8';
+      heightClass = 'h-[80px]';
     } else if (isDesktop) {
-      return '48px 64px';
+      paddingClasses = 'px-16 py-12';
+      heightClass = 'h-[87px]';
+    } else {
+      paddingClasses = 'px-[124px] py-16';
+      heightClass = 'h-[87px]';
     }
-    return '64px 124px'; // Large desktop
+    
+    return `fixed w-full flex justify-between items-center z-[4] transition-all duration-300 ${paddingClasses} ${heightClass} ${inHeroSection ? 'bg-transparent' : 'bg-white/95 shadow-sm'}`;
   };
-
-  // Only calculate these values client-side to avoid hydration mismatches
-  const headerPadding = mounted ? getHeaderPadding() : '64px 124px';
-  const headerHeight = mounted ? (isExtraSmall ? '60px' : isMobile ? '70px' : '87px') : '87px';
   
   // Logo sizes
   const logoWidth = mounted ? (isExtraSmall ? 70 : isMobile ? 90 : 118.15) : 118.15;
@@ -74,19 +81,13 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
 
   return (
     <header 
-      className={`fixed w-full flex justify-between items-center z-[4] transition-all duration-300 ${inHeroSection ? 'bg-transparent' : 'bg-white/95 shadow-sm'}`}
-      style={{
-        padding: headerPadding,
-        height: headerHeight,
-        maxWidth: '100%',
-        margin: '0 auto',
-      }}
+      className={mounted ? getHeaderClasses() : "fixed w-full flex justify-between items-center z-[4] transition-all duration-300 px-[124px] py-16 h-[87px] bg-transparent"}
     >
       {/* Spacer for left side to balance the layout */}
       <div className="flex-1"></div>
       
       {/* Centered Logo with transition */}
-      <div className="flex-1 flex justify-center items-center" style={{ zIndex: 0 }}>
+      <div className="flex-1 flex justify-center items-center z-0">
         <div className="transition-opacity duration-300">
           <Image 
             src={logoSrc}
@@ -94,8 +95,7 @@ const Header: React.FC<HeaderProps> = ({ isMuted, onToggleMute }) => {
             width={logoWidth}
             height={logoHeight}
             priority
-            className="transition-all duration-300"
-            style={{ width: 'auto', height: 'auto' }}
+            className="transition-all duration-300 w-auto h-auto"
           />
         </div>
       </div>

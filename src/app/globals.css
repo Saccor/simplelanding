@@ -17,414 +17,53 @@ body {
   background: rgb(var(--background-start-rgb));
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-  -webkit-text-size-adjust: 100%; /* Prevent text size adjust after orientation change on iOS */
+  -webkit-text-size-adjust: 100%;
   width: 100%;
-  min-width: 320px; /* Set minimum width to prevent extreme squeezing */
+  min-width: 320px;
 }
 
-.hero-section {
-  background-color: #11141b;
-  min-height: 520px;
-  height: 100vh; /* Full viewport height for fullscreen video */
-  width: 100%;
-}
+/* …your other global rules… */
 
-/* Video container aspect ratio preservation */
-.video-container {
-  width: 100%;
-  max-width: 1440px;
-  position: relative;
-  margin: 0 auto;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%; /* Full height */
-}
-
-.video-container::before {
-  content: "";
-  display: block;
-  padding-top: calc(879 / 1440 * 100%); /* Maintain the 1440:879 aspect ratio */
-}
-
-.video-container > * {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Scroll down button hover effect */
-.scroll-down-btn {
-  transition: transform 0.3s ease;
-}
-
-.scroll-down-btn:hover {
-  transform: translateY(5px);
-}
-
-/* Responsive text sizes */
-@media (max-width: 480px) {
-  h1, h2, h3 {
-    word-wrap: break-word;
-    hyphens: auto;
-  }
-  
-  input, button {
-    font-size: 14px !important;
-  }
-}
-
-/* Footer responsive adjustments */
-@media (max-width: 480px) {
-  .footer-container {
-    padding: 16px 8px !important;
-    flex-direction: row !important;
-    gap: 4px !important;
-    flex-wrap: nowrap !important;
-  }
-  
-  .social-icons-container {
-    width: auto !important;
-    gap: 8px !important;
-  }
-  
-  .center-links-container {
-    width: auto !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    font-size: 10px !important;
-    line-height: 16px !important;
-  }
-  
-  /* Ensure text doesn't wrap on small screens */
-  .footer-text {
-    white-space: nowrap !important;
-    font-size: 10px !important;
-    line-height: 16px !important;
-  }
-  
-  /* Scale down social icons */
-  .footer-social-icon {
-    transform: scale(0.7) !important;
-  }
-  
-  /* Make the logo smaller on very small screens */
-  .footer-logo {
-    max-width: 60px !important;
-    height: auto !important;
-  }
-}
-
-/* Additional responsive adjustments for iPhone SE and other very small screens */
-@media (max-width: 375px) {
-  /* Further reduce footer element sizes */
-  .center-links-container {
-    gap: 4px !important;
-    font-size: 9px !important;
-  }
-  
-  .social-icons-container {
-    gap: 6px !important;
-  }
-  
-  .footer-social-icon {
-    transform: scale(0.6) !important;
-  }
-  
-  .footer-logo {
-    max-width: 50px !important;
-  }
-}
-
-/* Text section container */
-.text-container {
-  width: 100%;
-  max-width: 1440px;
-  position: relative;
-  background: #FFFFFF;
-  flex: none;
-  order: 1;
-  flex-grow: 0;
-  z-index: 1;
-  min-height: 522px;
-  height: auto;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.text-container > div {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
-}
-
-/* Scroll animation classes */
-.scroll-reveal {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.scroll-reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Delay classes for staggered animation */
-.delay-100 {
-  transition-delay: 100ms;
-}
-
-.delay-200 {
-  transition-delay: 200ms;
-}
-
-.delay-300 {
-  transition-delay: 300ms;
-}
-
-.delay-400 {
-  transition-delay: 400ms;
-}
-
-.delay-500 {
-  transition-delay: 500ms;
-}
-
-.signup-button {
-  background-color: #a75c31;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.signup-button:hover {
-  background-color: #8c4e29;
-}
-
-/* Hide scrollbar by default */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
-
-/* Animations */
-@keyframes float-in {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) rotateX(-10deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) rotateX(0);
-  }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scale-fade-in {
-  0% { opacity: 0; transform: scale(1.1); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slide-up-fade {
-  0% { opacity: 0; transform: translateY(30px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.animate-float-in {
-  animation: float-in 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
-}
-
-.animate-scale-fade-in {
-  animation: scale-fade-in 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-.animate-slide-up-fade {
-  animation: slide-up-fade 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Footer container */
+/* Footer container - mobile first approach */
 .footer-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 32px 124px 24px;
-  max-width: 1440px;
+  padding: 24px 16px;
+  gap: 24px;
   width: 100%;
-  height: auto;
-  min-height: 110px;
   background: #FFFFFF;
   flex: none;
   order: 3;
   flex-grow: 0;
   z-index: 3;
+  margin: 0 auto;
 }
 
-@media (max-width: 768px) {
+/* Responsive adjustments for footer */
+@media (min-width: 640px) {
   .footer-container {
-    padding: 20px 24px;
+    padding: 28px 24px;
+    gap: 28px;
   }
 }
 
-/* Social media icon colors */
-.youtube-icon {
-  color: #FF0000;
-}
-
-.instagram-icon {
-  color: #E1306C;
-}
-
-.linkedin-icon {
-  color: #0077B5;
-}
-
-/* Social icons container */
-.social-icons-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0px;
-  gap: 18px;
-  height: 30px;
-  justify-content: flex-end;
-  flex: 1;
-}
-
-/* Center links container */
-.center-links-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0px;
-  gap: 12px;
-  height: 24px;
-  justify-content: center;
-  flex: 2;
-  font-family: 'Poppins', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  color: #000000;
-}
-
-@media (max-width: 640px) {
-  .center-links-container {
-    flex-wrap: wrap;
-    gap: 10px;
-    font-size: 14px;
-    line-height: 20px;
+@media (min-width: 768px) {
+  .footer-container {
+    padding: 30px 40px;
+    gap: 30px;
   }
 }
 
-/* Footer text styling */
-.footer-text {
-  font-family: 'Poppins', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  color: #000000;
+@media (min-width: 1024px) {
+  .footer-container {
+    padding: 32px 60px;
+    gap: 32px;
+  }
 }
 
-/* Specific styling for copyright text */
-.center-links-container span.footer-text {
-  position: relative;
-  top: -2px; /* Slight offset to match design */
-}
-
-/* Specifically target the copyright text for alignment */
-.copyright-text {
-  display: flex !important;
-  align-items: center !important;
-  transform: none !important;
-  vertical-align: middle !important;
-  position: static !important;
-  top: 0 !important;
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 56rem;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-/* Make sure modals are visible over everything else */
-#modal-root {
-  position: relative;
-  z-index: 1000;
-}
-
-/* Override any potential conflicts */
-.fixed {
-  position: fixed !important;
-}
-
-.z-1000 {
-  z-index: 1000 !important;
-}
-
-/* Ensure the body doesn't scroll when modal is open */
-body.modal-open {
-  overflow: hidden;
+@media (min-width: 1280px) {
+  .footer-container {
+    padding: 32px 124px;
+  }
 }
