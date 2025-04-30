@@ -1,20 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect, CSSProperties } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import useScrollObserver from '../hooks/useScrollObserver';
 import useWindowSize, { breakpoints } from '../hooks/useWindowSize';
-import { addSubscriber, addSubscriberToGroup } from '../services/mailerLite';
-import MailerLiteScripts from './MailerLiteScripts';
-import MailerLiteForm from './MailerLiteForm';
-import { MAILERLITE_ACCOUNT_ID, MAILERLITE_FORM_ID, USE_EMBEDDED_FORM, MAILERLITE_API_KEY, MAILERLITE_GROUP_ID } from '../config/mailerLite';
-
-// Debug log - remove in production
-console.log("API Key Status:", MAILERLITE_API_KEY ? "Set" : "Not Set");
-console.log("Group ID Status:", MAILERLITE_GROUP_ID ? "Set" : "Not Set");
-
-// You can use either the API approach or the embedded form approach
-// Configuration is set in src/config/mailerLite.ts
+import { toast } from 'react-toastify';
+import { EMAIL_SUBMISSION_ENABLED, EMAIL_SIGNUP_ENDPOINT } from '../config/emailConfig';
 
 interface EmailSectionProps {
   emailHeading: string;
@@ -31,8 +22,13 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
-  const [mounted, setMounted] = useState(false);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
+  const [isClient, setIsClient] = useState(false);
+  
+  // Check if code is running on client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   // Refs for scroll animations
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -40,12 +36,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const embeddedFormRef = useRef<HTMLDivElement>(null);
-
-  // This will help avoid hydration mismatches
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Add Poppins font
   useEffect(() => {
@@ -57,27 +47,6 @@ const EmailSection: React.FC<EmailSectionProps> = ({
       document.head.appendChild(link);
     }
   }, []);
-  
-  // Setup embedded form if using that approach
-  useEffect(() => {
-    if (USE_EMBEDDED_FORM && mounted && embeddedFormRef.current) {
-      // Only try to clear if there are children
-      if (embeddedFormRef.current.firstChild) {
-        embeddedFormRef.current.innerHTML = '';
-      }
-      
-      // Create the embedded form div
-      const formDiv = document.createElement('div');
-      formDiv.className = 'ml-embedded';
-      formDiv.dataset.form = MAILERLITE_FORM_ID;
-      embeddedFormRef.current.appendChild(formDiv);
-      
-      // Embed the form if ml is available
-      if (window.ml) {
-        window.ml('embedForms');
-      }
-    }
-  }, [mounted]);
   
   // Use scroll observers
   useScrollObserver({ ref: headingRef });
@@ -92,68 +61,44 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     setIsSubmitting(true);
     
     try {
-      if (USE_EMBEDDED_FORM) {
-        // When using the embedded form, form submissions are handled by MailerLite
-        console.log('Using embedded form - form submissions handled by MailerLite');
-        setFormState('success');
-        setEmail('');
-      } else {
-        // Use our API integration
-        if (!MAILERLITE_API_KEY) {
-          console.error('Missing MailerLite API key - please add to .env.local file');
-          setFormState('error');
-          return;
-        }
-
-        console.log('Submitting email via API integration...');
-        const userData = { 
-          email,
-          // You can add additional fields as needed
-          fields: {
-            source: 'website_signup',
-            signup_date: new Date().toISOString()
-          }
-        };
-        
-        try {
-          // First try adding to a specific group if group ID is available
-          if (MAILERLITE_GROUP_ID) {
-            console.log(`Attempting to add to group ${MAILERLITE_GROUP_ID}...`);
-            await addSubscriberToGroup(MAILERLITE_GROUP_ID, userData);
-            console.log('Successfully added to group');
-          } else {
-            // Fallback to just adding subscriber without group
-            console.log('No group ID available, adding subscriber directly');
-            await addSubscriber(userData);
-            console.log('Successfully added subscriber');
-          }
-          
-          console.log('Email submitted to MailerLite:', email);
-          setFormState('success');
-          setEmail('');
-        } catch (apiError) {
-          console.error('First attempt failed:', apiError);
-          
-          // If adding to group fails, try just adding the subscriber
-          if (MAILERLITE_GROUP_ID) {
-            try {
-              console.log('Falling back to adding subscriber without group');
-              await addSubscriber(userData);
-              console.log('Fallback successful');
-              setFormState('success');
-              setEmail('');
-              return;
-            } catch (fallbackError) {
-              console.error('Fallback attempt failed:', fallbackError);
-            }
-          }
-          
-          // If we reach here, both attempts failed
-          throw apiError;
-        }
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Submitting email via API endpoint...');
       }
-    } catch (error) {
+      
+      const userData = { 
+        email,
+        fields: {
+          source: 'website_signup',
+          signup_date: new Date().toISOString()
+        }
+      };
+      
+      // Call our API endpoint
+      const response = await fetch(EMAIL_SIGNUP_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.details || 'Failed to subscribe');
+      }
+      
+      const data = await response.json();
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Successfully added subscriber via API:', data);
+      }
+      
+      setFormState('success');
+      toast.success('Thank you for signing up!');
+      setEmail('');
+    } catch (error: any) {
       console.error('Error submitting email:', error);
+      toast.error(error.message || 'Failed to subscribe. Please try again.');
       setFormState('error');
     } finally {
       setIsSubmitting(false);
@@ -162,7 +107,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   };
 
   // Check if device is extra small (iPhone SE size)
-  const isExtraSmall = mounted && width <= breakpoints.xs;
+  const isExtraSmall = isClient && width <= breakpoints.xs;
 
   // Calculate text sizes based on screen size
   const getTextSizes = () => {
@@ -210,7 +155,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   };
 
   // Get text sizes
-  const textSizes = mounted ? getTextSizes() : {
+  const textSizes = isClient ? getTextSizes() : {
     headingSize: '30px',
     headingLineHeight: '38px',
     descriptionSize: '18px',
@@ -219,18 +164,15 @@ const EmailSection: React.FC<EmailSectionProps> = ({
     formGap: '30px',
     formPadding: '20px 0px'
   };
-
+  
   // Only use desktop layout on desktop sizes
-  const useDesktopLayout = mounted && (isDesktop || isLargeDesktop);
+  // IMPORTANT: This was causing hydration mismatch - we need to default to the same layout on server and client
+  // Then update client-side only after hydration
+  const useDesktopLayout = isClient && (isDesktop || isLargeDesktop);
 
-  // If not using embedded form and no API key, show custom message in form
-  const isApiConfigured = USE_EMBEDDED_FORM ? !!MAILERLITE_FORM_ID : !!MAILERLITE_API_KEY;
-
-  return (
-    <>
-      {/* Include MailerLite scripts if using embedded form */}
-      {USE_EMBEDDED_FORM && <MailerLiteScripts accountId={MAILERLITE_ACCOUNT_ID} />}
-      
+  // If not client-side rendered yet, don't show any content to prevent hydration mismatch
+  if (!isClient) {
+    return (
       <section 
         ref={sectionRef}
         className="w-full flex justify-center bg-[#F3F3F3]"
@@ -238,489 +180,471 @@ const EmailSection: React.FC<EmailSectionProps> = ({
           zIndex: 2,
           order: 2,
           alignSelf: 'stretch',
-          flexGrow: 0
+          flexGrow: 0,
+          minHeight: '650px' // Add minimum height to prevent layout shift
         }}
       >
-        <div 
-          className="w-full max-w-[1440px] relative"
-          style={{
-            height: useDesktopLayout ? '650px' : 'auto'
-          }}
-        >
-          {/* For Desktop: Absolute positioned elements */}
-          {useDesktopLayout && (
-            <>
-              {/* Image - Desktop */}
-              <div
+        {/* Loading state */}
+      </section>
+    );
+  }
+
+  return (
+    <section 
+      ref={sectionRef}
+      className="w-full flex justify-center bg-[#F3F3F3]"
+      style={{
+        zIndex: 2,
+        order: 2,
+        alignSelf: 'stretch',
+        flexGrow: 0
+      }}
+    >
+      <div 
+        className="w-full max-w-[1440px] relative"
+        style={{
+          height: useDesktopLayout ? '650px' : 'auto'
+        }}
+      >
+        {/* For Desktop: Absolute positioned elements */}
+        {useDesktopLayout && (
+          <>
+            {/* Image - Desktop */}
+            <div
+              style={{
+                position: 'absolute',
+                width: '488px',
+                height: '650px',
+                left: '0px',
+                top: '0px',
+                overflow: 'hidden'
+              }}
+            >
+              <Image
+                src={emailImage}
+                alt="Arfve earbuds"
+                fill
+                sizes="488px"
                 style={{
-                  position: 'absolute',
-                  width: '488px',
-                  height: '650px',
-                  left: '0px',
-                  top: '0px',
-                  overflow: 'hidden'
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  opacity: imageLoading ? 0 : 1,
+                  transition: 'opacity 0.5s ease'
                 }}
-              >
-                <Image
-                  src={emailImage}
-                  alt="Arfve earbuds"
-                  fill
-                  sizes="488px"
-                  style={{
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    opacity: imageLoading ? 0 : 1,
-                    transition: 'opacity 0.5s ease'
-                  }}
-                  onLoad={() => setImageLoading(false)}
-                  loading="eager"
-                  priority
-                  quality={90}
-                />
-              </div>
-              
-              {/* Content - Desktop */}
-              <div
+                onLoad={() => setImageLoading(false)}
+                loading="eager"
+                priority
+                quality={90}
+              />
+            </div>
+            
+            {/* Content - Desktop */}
+            <div
+              style={{
+                position: 'absolute',
+                left: isLargeDesktop ? '653.99px' : width > 1200 ? '610px' : '580px',
+                top: '135.5px',
+                width: isLargeDesktop ? '607px' : '580px',
+                zIndex: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '42px'
+              }}
+            >
+              {/* Heading Container */}
+              <div 
                 style={{
-                  position: 'absolute',
-                  left: isLargeDesktop ? '653.99px' : width > 1200 ? '610px' : '580px',
-                  top: '135.5px',
-                  width: isLargeDesktop ? '607px' : '580px',
-                  zIndex: 2,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  gap: '42px'
+                  padding: '0px',
+                  gap: textSizes.gap,
+                  width: '100%'
                 }}
               >
-                {/* Heading Container */}
-                <div 
+                <h2 
+                  ref={headingRef}
+                  className="scroll-reveal"
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    padding: '0px',
-                    gap: textSizes.gap,
-                    width: '100%'
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
                   }}
                 >
-                  <h2 
-                    ref={headingRef}
-                    className="scroll-reveal"
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 600,
-                      fontSize: textSizes.headingSize,
-                      lineHeight: textSizes.headingLineHeight,
-                      color: '#192124'
-                    }}
-                  >
-                    {emailHeading}
-                  </h2>
-                  
-                  <p 
-                    ref={subtextRef}
-                    className="scroll-reveal delay-200"
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 600,
-                      fontSize: textSizes.headingSize,
-                      lineHeight: textSizes.headingLineHeight,
-                      color: '#192124'
-                    }}
-                  >
-                    {emailSubtext}
-                  </p>
-                </div>
+                  {emailHeading}
+                </h2>
                 
-                {/* Form Container */}
-                <div
-                  ref={formRef}
-                  className="scroll-reveal delay-300"
+                <p 
+                  ref={subtextRef}
+                  className="scroll-reveal delay-200"
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    padding: textSizes.formPadding,
-                    gap: textSizes.formGap,
-                    width: '421.79px',
-                    filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-                    borderRadius: '20px'
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
                   }}
                 >
-                  <p 
-                    ref={descriptionRef}
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 400,
-                      fontSize: textSizes.descriptionSize,
-                      lineHeight: textSizes.descriptionLineHeight,
-                      color: '#192124',
-                      width: '100%'
-                    }}
-                  >
-                    Sign up with your email address, pay €1 to get our best opening offer
-                  </p>
-                  
-                  {USE_EMBEDDED_FORM ? (
-                    // Embedded MailerLite form option
-                    <div 
-                      ref={embeddedFormRef} 
-                      className="w-full"
-                      style={{ minHeight: '44px' }}
-                    >
-                      {MAILERLITE_FORM_ID ? (
-                        <MailerLiteForm formId={MAILERLITE_FORM_ID} className="w-full" />
-                      ) : (
-                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                          MailerLite form ID not configured. Please add it to your environment variables.
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    // Custom form with API integration
-                    <div 
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        padding: '0px',
-                        gap: '12px',
-                        width: '100%',
-                        height: '44px'
-                      }}
-                    >
-                      {!MAILERLITE_API_KEY ? (
-                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                          MailerLite API key not configured. Please add it to your environment variables.
-                        </p>
-                      ) : (
-                        <>
-                          <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="email"
-                            style={{
-                              boxSizing: 'border-box',
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              padding: '10px 20px',
-                              gap: '10px',
-                              width: '311.79px',
-                              height: '44px',
-                              background: '#FFFFFF',
-                              border: '1px solid rgba(0, 0, 0, 0.48)',
-                              borderRadius: '28px',
-                              fontFamily: "'Poppins', sans-serif",
-                              fontStyle: 'normal',
-                              fontWeight: 400,
-                              fontSize: '14px',
-                              lineHeight: '20px',
-                              textAlign: 'center',
-                              color: '#000000',
-                              flex: 1
-                            }}
-                            autoComplete="email"
-                          />
-                          
-                          <button
-                            onClick={handleSubmit}
-                            disabled={isSubmitting}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: '10px 20px',
-                              gap: '10px',
-                              width: '98px',
-                              height: '44px',
-                              background: '#B4694A',
-                              borderRadius: '55px',
-                              fontFamily: "'Poppins', sans-serif",
-                              fontStyle: 'normal',
-                              fontWeight: 500,
-                              fontSize: '14px',
-                              lineHeight: '20px',
-                              textAlign: 'center',
-                              color: '#FFFFFF',
-                              border: 'none',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Sign-up
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Success/Error Messages */}
-                  {mounted && formState === 'success' && (
-                    <p style={{ 
-                      marginTop: '8px', 
-                      color: '#059669',
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: '14px'
-                    }}>
-                      Thank you for signing up!
-                    </p>
-                  )}
-                  {mounted && formState === 'error' && (
-                    <p style={{ 
-                      marginTop: '8px', 
-                      color: '#DC2626',
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: '14px'
-                    }}>
-                      Something went wrong. Please try again.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-          
-          {/* For Mobile and Tablet: Stacked layout */}
-          {!useDesktopLayout && (
-            <div className="flex flex-col w-full">
-              {/* Image - Mobile */}
-              <div
-                style={{
-                  width: '100%',
-                  height: isExtraSmall ? '320px' : isTablet ? '400px' : '380px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <Image
-                  src={emailImage}
-                  alt="Arfve earbuds"
-                  fill
-                  sizes="100vw"
-                  style={{
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    opacity: imageLoading ? 0 : 1,
-                    transition: 'opacity 0.5s ease'
-                  }}
-                  onLoad={() => setImageLoading(false)}
-                  loading="eager"
-                  priority
-                  quality={90}
-                />
+                  {emailSubtext}
+                </p>
               </div>
               
-              {/* Content - Mobile */}
+              {/* Form Container */}
               <div
-                className="w-full"
+                ref={formRef}
+                className="scroll-reveal delay-300"
                 style={{
-                  padding: isExtraSmall ? '24px 20px' : isTablet ? '40px 24px' : '32px 24px',
-                  gap: isExtraSmall ? '24px' : '42px',
                   display: 'flex',
-                  flexDirection: 'column'
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: textSizes.formPadding,
+                  gap: textSizes.formGap,
+                  width: '421.79px',
+                  filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+                  borderRadius: '20px'
                 }}
               >
-                {/* Heading Container */}
-                <div 
+                <p 
+                  ref={descriptionRef}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: textSizes.gap,
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    fontSize: textSizes.descriptionSize,
+                    lineHeight: textSizes.descriptionLineHeight,
+                    color: '#192124',
                     width: '100%'
                   }}
                 >
-                  <h2 
-                    ref={headingRef}
-                    className="scroll-reveal"
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 600,
-                      fontSize: textSizes.headingSize,
-                      lineHeight: textSizes.headingLineHeight,
-                      color: '#192124'
-                    }}
-                  >
-                    {emailHeading}
-                  </h2>
-                  
-                  <p 
-                    ref={subtextRef}
-                    className="scroll-reveal delay-200"
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 600,
-                      fontSize: textSizes.headingSize,
-                      lineHeight: textSizes.headingLineHeight,
-                      color: '#192124'
-                    }}
-                  >
-                    {emailSubtext}
-                  </p>
-                </div>
+                  Sign up with your email address, pay €1 to get our best opening offer
+                </p>
                 
-                {/* Form Container */}
-                <div
-                  ref={formRef}
-                  className="scroll-reveal delay-300 w-full"
+                {/* Custom form with API integration */}
+                <div 
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    padding: textSizes.formPadding,
-                    gap: textSizes.formGap,
-                    filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
-                    borderRadius: '20px'
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '0px',
+                    gap: '12px',
+                    width: '100%',
+                    height: '44px'
                   }}
                 >
-                  <p 
-                    ref={descriptionRef}
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontStyle: 'normal',
-                      fontWeight: 400,
-                      fontSize: textSizes.descriptionSize,
-                      lineHeight: textSizes.descriptionLineHeight,
-                      color: '#192124',
-                      width: '100%'
-                    }}
-                  >
-                    Sign up with your email address, pay €1 to get our best opening offer
-                  </p>
-                  
-                  {USE_EMBEDDED_FORM ? (
-                    // Embedded MailerLite form option
-                    <div 
-                      ref={embeddedFormRef} 
-                      className="w-full"
-                      style={{ minHeight: isExtraSmall ? '40px' : '44px' }}
-                    >
-                      {MAILERLITE_FORM_ID ? (
-                        <MailerLiteForm formId={MAILERLITE_FORM_ID} className="w-full" />
-                      ) : (
-                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                          MailerLite form ID not configured. Please add it to your environment variables.
-                        </p>
-                      )}
-                    </div>
+                  {!EMAIL_SUBMISSION_ENABLED ? (
+                    <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                      Email submission is currently disabled.
+                    </p>
                   ) : (
-                    // Custom form with API integration
-                    <div 
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        padding: '0px',
-                        gap: '12px',
-                        width: '100%',
-                        height: isExtraSmall ? '40px' : '44px'
-                      }}
-                    >
-                      {!MAILERLITE_API_KEY ? (
-                        <p style={{ color: '#DC2626', fontSize: '14px' }}>
-                          MailerLite API key not configured. Please add it to your environment variables.
-                        </p>
-                      ) : (
-                        <>
-                          <input
-                            type="email"
-                            id="email-mobile"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="email"
-                            style={{
-                              boxSizing: 'border-box',
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                              gap: '10px',
-                              height: isExtraSmall ? '40px' : '44px',
-                              background: '#FFFFFF',
-                              border: '1px solid rgba(0, 0, 0, 0.48)',
-                              borderRadius: '28px',
-                              fontFamily: "'Poppins', sans-serif",
-                              fontStyle: 'normal',
-                              fontWeight: 400,
-                              fontSize: isExtraSmall ? '12px' : '14px',
-                              lineHeight: isExtraSmall ? '18px' : '20px',
-                              textAlign: 'center',
-                              color: '#000000',
-                              flex: 1
-                            }}
-                            autoComplete="email"
-                          />
-                          
-                          <button
-                            onClick={handleSubmit}
-                            disabled={isSubmitting}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: isExtraSmall ? '8px 16px' : '10px 20px',
-                              gap: '10px',
-                              width: isExtraSmall ? '90px' : '98px',
-                              height: isExtraSmall ? '40px' : '44px',
-                              background: '#B4694A',
-                              borderRadius: '55px',
-                              fontFamily: "'Poppins', sans-serif",
-                              fontStyle: 'normal',
-                              fontWeight: 500,
-                              fontSize: isExtraSmall ? '12px' : '14px',
-                              lineHeight: isExtraSmall ? '18px' : '20px',
-                              textAlign: 'center',
-                              color: '#FFFFFF',
-                              border: 'none',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Sign-up
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Success/Error Messages */}
-                  {mounted && formState === 'success' && (
-                    <p style={{ 
-                      marginTop: '8px', 
-                      color: '#059669',
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: isExtraSmall ? '12px' : '14px'
-                    }}>
-                      Thank you for signing up!
-                    </p>
-                  )}
-                  {mounted && formState === 'error' && (
-                    <p style={{ 
-                      marginTop: '8px', 
-                      color: '#DC2626',
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: isExtraSmall ? '12px' : '14px'
-                    }}>
-                      Something went wrong. Please try again.
-                    </p>
+                    <>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="email"
+                        style={{
+                          boxSizing: 'border-box',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          padding: '10px 20px',
+                          gap: '10px',
+                          width: '311.79px',
+                          height: '44px',
+                          background: '#FFFFFF',
+                          border: '1px solid rgba(0, 0, 0, 0.48)',
+                          borderRadius: '28px',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontStyle: 'normal',
+                          fontWeight: 400,
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          textAlign: 'center',
+                          color: '#000000',
+                          flex: 1
+                        }}
+                        autoComplete="email"
+                      />
+                      
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '10px 20px',
+                          gap: '10px',
+                          width: '98px',
+                          height: '44px',
+                          background: '#B4694A',
+                          borderRadius: '55px',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontStyle: 'normal',
+                          fontWeight: 500,
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          textAlign: 'center',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Sign-up
+                      </button>
+                    </>
                   )}
                 </div>
+                
+                {/* Success/Error Messages */}
+                {isClient && formState === 'success' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#059669',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: '14px'
+                  }}>
+                    Thank you for signing up!
+                  </p>
+                )}
+                {isClient && formState === 'error' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#DC2626',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: '14px'
+                  }}>
+                    Something went wrong. Please try again.
+                  </p>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </section>
-    </>
+          </>
+        )}
+        
+        {/* For Mobile and Tablet: Stacked layout */}
+        {!useDesktopLayout && (
+          <div className="flex flex-col w-full">
+            {/* Image - Mobile */}
+            <div
+              style={{
+                width: '100%',
+                height: isExtraSmall ? '320px' : isTablet ? '400px' : '380px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              <Image
+                src={emailImage}
+                alt="Arfve earbuds"
+                fill
+                sizes="100vw"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  opacity: imageLoading ? 0 : 1,
+                  transition: 'opacity 0.5s ease'
+                }}
+                onLoad={() => setImageLoading(false)}
+                loading="eager"
+                priority
+                quality={90}
+              />
+            </div>
+            
+            {/* Content - Mobile */}
+            <div
+              className="w-full"
+              style={{
+                padding: isExtraSmall ? '24px 20px' : isTablet ? '40px 24px' : '32px 24px',
+                gap: isExtraSmall ? '24px' : '42px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* Heading Container */}
+              <div 
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: textSizes.gap,
+                  width: '100%'
+                }}
+              >
+                <h2 
+                  ref={headingRef}
+                  className="scroll-reveal"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailHeading}
+                </h2>
+                
+                <p 
+                  ref={subtextRef}
+                  className="scroll-reveal delay-200"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    fontSize: textSizes.headingSize,
+                    lineHeight: textSizes.headingLineHeight,
+                    color: '#192124'
+                  }}
+                >
+                  {emailSubtext}
+                </p>
+              </div>
+              
+              {/* Form Container */}
+              <div
+                ref={formRef}
+                className="scroll-reveal delay-300 w-full"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  padding: textSizes.formPadding,
+                  gap: textSizes.formGap,
+                  filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
+                  borderRadius: '20px'
+                }}
+              >
+                <p 
+                  ref={descriptionRef}
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontStyle: 'normal',
+                    fontWeight: 400,
+                    fontSize: textSizes.descriptionSize,
+                    lineHeight: textSizes.descriptionLineHeight,
+                    color: '#192124',
+                    width: '100%'
+                  }}
+                >
+                  Sign up with your email address, pay €1 to get our best opening offer
+                </p>
+
+                {/* Custom form with API integration */}
+                <div 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '0px',
+                    gap: '12px',
+                    width: '100%',
+                    height: isExtraSmall ? '40px' : '44px'
+                  }}
+                >
+                  {!EMAIL_SUBMISSION_ENABLED ? (
+                    <p style={{ color: '#DC2626', fontSize: '14px' }}>
+                      Email submission is currently disabled.
+                    </p>
+                  ) : (
+                    <>
+                      <input
+                        type="email"
+                        id="email-mobile"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="email"
+                        style={{
+                          boxSizing: 'border-box',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                          gap: '10px',
+                          height: isExtraSmall ? '40px' : '44px',
+                          background: '#FFFFFF',
+                          border: '1px solid rgba(0, 0, 0, 0.48)',
+                          borderRadius: '28px',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontStyle: 'normal',
+                          fontWeight: 400,
+                          fontSize: isExtraSmall ? '12px' : '14px',
+                          lineHeight: isExtraSmall ? '18px' : '20px',
+                          textAlign: 'center',
+                          color: '#000000',
+                          flex: 1
+                        }}
+                        autoComplete="email"
+                      />
+                      
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: isExtraSmall ? '8px 16px' : '10px 20px',
+                          gap: '10px',
+                          width: isExtraSmall ? '90px' : '98px',
+                          height: isExtraSmall ? '40px' : '44px',
+                          background: '#B4694A',
+                          borderRadius: '55px',
+                          fontFamily: "'Poppins', sans-serif",
+                          fontStyle: 'normal',
+                          fontWeight: 500,
+                          fontSize: isExtraSmall ? '12px' : '14px',
+                          lineHeight: isExtraSmall ? '18px' : '20px',
+                          textAlign: 'center',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Sign-up
+                      </button>
+                    </>
+                  )}
+                </div>
+                
+                {/* Success/Error Messages */}
+                {isClient && formState === 'success' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#059669',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: isExtraSmall ? '12px' : '14px'
+                  }}>
+                    Thank you for signing up!
+                  </p>
+                )}
+                {isClient && formState === 'error' && (
+                  <p style={{ 
+                    marginTop: '8px', 
+                    color: '#DC2626',
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: isExtraSmall ? '12px' : '14px'
+                  }}>
+                    Something went wrong. Please try again.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 
