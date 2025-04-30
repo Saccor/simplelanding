@@ -61,9 +61,12 @@ export default function SimpleLanding({
           emailImage={emailImage}
         />
         
-        {/* Footer */}
-        <Footer />
+        {/* Clear section break before footer */}
+        <div className="w-full h-16"></div>
       </div>
+      
+      {/* Footer - moved outside of content-container for full width */}
+      <Footer />
     </main>
   );
 } 

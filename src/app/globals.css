@@ -19,14 +19,14 @@ body {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   width: 100%;
-  min-width: 320px;
+  /* Removed min-width to allow scaling down to extremely small sizes */
 }
 
-/* Center content on larger screens */
-main > div,
-section > div {
+/* Only center your content wrapper */
+.content-container {
   margin-left: auto;
   margin-right: auto;
+  max-width: 1192px;
 }
 
 /* Ensure text containers are centered on larger screens */
@@ -36,11 +36,53 @@ section > div {
   text-align: center;
 }
 
-/* Custom responsive adjustments for large screens */
+/* Footer sizing */
+#footer-section {
+  width: 100%;
+  max-width: 100%;
+}
+
+#footer-section > div {
+  width: 1440px !important;
+  height: 100px !important;
+}
+
+/* Navigation spacing */
+.main-nav-links {
+  gap: 41px;
+}
+
+.footer-policy-links {
+  gap: 12px;
+}
+
+.social-media-icons {
+  gap: 20px;
+}
+
+/* Custom responsive adjustments - from nano screens to ultrawide */
+@media (max-width: 60px) {
+  /* Ultra-small screens (53px) */
+  .content-container {
+    width: 100%;
+  }
+  
+  /* Reduce gaps on ultra-small screens */
+  .main-nav-links { gap: 4px; }
+  .footer-policy-links { gap: 4px; }
+  .social-media-icons { gap: 4px; }
+}
+
 @media (min-width: 1440px) {
   .content-container {
     max-width: 1440px;
-    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1920px) {
+  /* Ultrawide monitors */
+  .content-container {
+    max-width: 1800px;
   }
 }
 
@@ -73,3 +115,6 @@ section > div {
 body.modal-open {
   overflow: hidden;
 }
+
+
+
