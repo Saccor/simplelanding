@@ -28,7 +28,7 @@ interface SimpleLandingProps {
 }
 
 export default function SimpleLanding({
-  videoUrl = "/videos/Hero v2.mp4",
+  videoUrl = "/videos/Hero v2-compressed.mp4",
   mobileVideoUrl,
   mainHeading = "WE'RE BUILDING TECHNOLOGY",
   subHeading = "THAT'S MORE THAN SMART",
