@@ -267,3 +267,7 @@ When making changes, test across these browsers and ensure compatibility with:
 ## License
 
 This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+
+
+the steps is general, loook in my code to always do it based on what we have and how we doo

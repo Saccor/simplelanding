@@ -8,6 +8,7 @@ const nextConfig = {
   },
   env: {
     MAILERLITE_API_KEY: process.env.MAILERLITE_API_KEY,
+    MAILERLITE_GROUP_ID: process.env.MAILERLITE_GROUP_ID,
   },
   images: {
     remotePatterns: [
