@@ -371,7 +371,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
         className="w-full relative mx-auto"
         style={{
           height: useDesktopLayout ? '650px' : 'auto',
-          maxWidth: '1440px'
+          maxWidth: '100%'
         }}
       >
         {/* For Desktop: Absolute positioned elements (large screens only) */}
@@ -381,7 +381,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
             <div
               style={{
                 position: 'absolute',
-                width: '488px',
+                width: '40%',
+                maxWidth: '488px',
                 height: '650px',
                 left: '0px',
                 top: '0px',
@@ -392,7 +393,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 src={emailImage}
                 alt="Arfve earbuds"
                 fill
-                sizes="488px"
+                sizes="(max-width: 1200px) 100vw, 40vw"
                 style={{
                   objectFit: 'cover',
                   objectPosition: 'center',
@@ -410,7 +411,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
             <div
               style={{
                 position: 'absolute',
-                width: '607px',
+                width: '50%',
+                maxWidth: '607px',
                 height: 'auto',
                 left: '55%',
                 top: '50%',
@@ -489,7 +491,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   padding: '20px 0px',
                   gap: '30px',
                   width: '100%',
-                  maxWidth: '500px',
+                  maxWidth: '100%',
                   height: 'auto',
                   filter: 'drop-shadow(0px 4px 49.6px rgba(0, 0, 0, 0.1))',
                   borderRadius: '20px',
