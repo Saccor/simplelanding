@@ -86,7 +86,7 @@ export default function SimpleLanding({
       />
 
       {/* Content Sections */}
-      <div id="content" className="w-full">
+      <div id="content" className="w-full content-container">
         {/* Text Section */}
         <TextSection
           textLines={[

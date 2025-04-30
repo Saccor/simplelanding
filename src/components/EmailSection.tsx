@@ -266,9 +266,9 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 position: 'absolute',
                 width: '607px',
                 height: 'auto',
-                left: '50%',
+                left: '55%',
                 top: '50%',
-                transform: 'translate(-20%, -50%)',
+                transform: 'translate(-25%, -50%)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
@@ -586,10 +586,10 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                   alignItems: 'flex-start',
                   padding: textSizes.formPadding,
                   gap: textSizes.formGap,
-                  filter: isTablet || isIpad ? 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.1))' : 'none',
+                  filter: isTablet || isIpad || isDesktop ? 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.1))' : 'none',
                   borderRadius: '20px',
-                  maxWidth: isTablet || isIpad ? '600px' : '100%',
-                  margin: isTablet || isIpad ? '0 auto' : '0'
+                  maxWidth: isTablet || isIpad || isDesktop ? '600px' : '100%',
+                  margin: isTablet || isIpad || isDesktop ? '0 auto' : '0'
                 }}
               >
                 <p 
