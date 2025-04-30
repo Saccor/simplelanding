@@ -1,0 +1,11 @@
+{
+  "buildCommand": "next build",
+  "cleanUrls": true,
+  "framework": "nextjs",
+  "regions": ["auto"],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+} 

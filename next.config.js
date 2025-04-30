@@ -12,25 +12,22 @@ const nextConfig = {
         pathname: '**',
       },
     ],
-    domains: ['assets.example.com'],
+    domains: ['assets.example.com', 'storage.googleapis.com'],
   },
-  // Only add webpack config when not using Turbopack
-  ...(process.env.TURBOPACK ? {} : {
-    webpack(config) {
-      config.module.rules.push({
-        test: /\.(mp4|webm|ogg)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next/static/media',
-            outputPath: 'static/media',
-            name: '[name].[hash].[ext]',
-          },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.(mp4|webm|ogg)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          publicPath: '/_next/static/media',
+          outputPath: 'static/media',
+          name: '[name].[hash].[ext]',
         },
-      });
-      return config;
-    },
-  }),
+      },
+    });
+    return config;
+  },
 };
 
 module.exports = nextConfig; 
