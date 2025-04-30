@@ -35,11 +35,9 @@ const CookieConsentBanner: React.FC = () => {
     // Apply cookie settings
     if (cookieOptions.analytics) {
       // Enable analytics cookies (placeholder)
-      console.log('Analytics cookies enabled');
     }
     if (cookieOptions.marketing) {
       // Enable marketing cookies (placeholder)
-      console.log('Marketing cookies enabled');
     }
     
     setShowSettings(false);
@@ -56,9 +54,6 @@ const CookieConsentBanner: React.FC = () => {
     // Store cookie preferences
     Cookies.set('cookieConsent', JSON.stringify(allOptions), { expires: 365 });
     
-    // Apply cookie settings
-    console.log('All cookies enabled');
-    
     setShowSettings(false);
   };
 
@@ -73,15 +68,52 @@ const CookieConsentBanner: React.FC = () => {
     // Store cookie preferences
     Cookies.set('cookieConsent', JSON.stringify(minimalOptions), { expires: 365 });
     
-    // Apply cookie settings
-    console.log('Only necessary cookies enabled');
-    
     setShowSettings(false);
   };
 
   // Toggle settings panel
   const toggleSettings = () => {
     setShowSettings(!showSettings);
+  };
+
+  const handleAcceptAnalytics = () => {
+    setCookieOptions({
+      ...cookieOptions,
+      analytics: true,
+      marketing: false,
+    });
+    setShowSettings(false);
+    acceptSelected();
+  };
+
+  const handleAcceptMarketing = () => {
+    setCookieOptions({
+      ...cookieOptions,
+      analytics: true,
+      marketing: true,
+    });
+    setShowSettings(false);
+    acceptSelected();
+  };
+
+  const handleAcceptAll = () => {
+    setCookieOptions({
+      ...cookieOptions,
+      analytics: true,
+      marketing: true,
+    });
+    setShowSettings(false);
+    acceptSelected();
+  };
+
+  const handleRejectAll = () => {
+    setCookieOptions({
+      ...cookieOptions,
+      analytics: false,
+      marketing: false,
+    });
+    setShowSettings(false);
+    acceptSelected();
   };
 
   return (

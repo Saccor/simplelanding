@@ -21,7 +21,8 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   const [imageLoading, setImageLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formState, setFormState] = useState<'idle' | 'success' | 'error'>('idle');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
   const [isClient, setIsClient] = useState(false);
   
@@ -54,56 +55,34 @@ const EmailSection: React.FC<EmailSectionProps> = ({
   useScrollObserver({ ref: descriptionRef, threshold: 0.2 });
   useScrollObserver({ ref: formRef, threshold: 0.3 });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email || isSubmitting) return;
-    
     setIsSubmitting(true);
-    
+    setError('');
+
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Submitting email to Formspree...');
-      }
-      
-      // Prepare data for Formspree
-      const formData = {
-        email,
-        source: 'website_signup',
-        signup_date: new Date().toISOString()
-      };
-      
-      // Call Formspree endpoint directly
       const response = await fetch(EMAIL_SIGNUP_ENDPOINT, {
         method: 'POST',
+        body: JSON.stringify({ email }),
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
       });
-      
-      // Formspree returns a 200 status for successful submissions
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to subscribe');
-      }
-      
+
       const data = await response.json();
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Successfully submitted to Formspree:', data);
+      if (response.ok) {
+        setEmail('');
+        setIsSuccess(true);
+        toast.success('Thank you for signing up!');
+        setIsSubmitting(false);
+      } else {
+        throw new Error(data.error || 'Something went wrong');
       }
-      
-      setFormState('success');
-      toast.success('Thank you for signing up!');
-      setEmail('');
-    } catch (error: any) {
-      console.error('Error submitting email:', error);
-      toast.error(error.message || 'Failed to subscribe. Please try again.');
-      setFormState('error');
-    } finally {
+    } catch (err) {
+      setError('Failed to submit. Please try again.');
       setIsSubmitting(false);
-      setTimeout(() => setFormState('idle'), 5000); // Reset after 5 seconds
     }
   };
 
@@ -491,7 +470,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 </form>
                 
                 {/* Success/Error Messages */}
-                {isClient && formState === 'success' && (
+                {isClient && isSuccess && (
                   <p style={{ 
                     marginTop: '8px', 
                     color: '#059669',
@@ -501,14 +480,14 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                     Thank you for signing up!
                   </p>
                 )}
-                {isClient && formState === 'error' && (
+                {isClient && error && (
                   <p style={{ 
                     marginTop: '8px', 
                     color: '#DC2626',
                     fontFamily: "'Poppins', sans-serif",
                     fontSize: '14px'
                   }}>
-                    Something went wrong. Please try again.
+                    {error}
                   </p>
                 )}
               </div>
@@ -714,7 +693,7 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                 </form>
                 
                 {/* Success/Error Messages */}
-                {isClient && formState === 'success' && (
+                {isClient && isSuccess && (
                   <p style={{ 
                     marginTop: '8px', 
                     color: '#059669',
@@ -724,14 +703,14 @@ const EmailSection: React.FC<EmailSectionProps> = ({
                     Thank you for signing up!
                   </p>
                 )}
-                {isClient && formState === 'error' && (
+                {isClient && error && (
                   <p style={{ 
                     marginTop: '8px', 
                     color: '#DC2626',
                     fontFamily: "'Poppins', sans-serif",
                     fontSize: isExtraSmall ? '12px' : '14px'
                   }}>
-                    Something went wrong. Please try again.
+                    {error}
                   </p>
                 )}
               </div>
