@@ -14,7 +14,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { width, isMobile, isTablet, isDesktop, isLargeDesktop } = useWindowSize();
-  const isExtraSmall = width <= breakpoints.xs;
+  const isExtraSmall = width <= 320;
 
   // This helps avoid hydration mismatches
   useEffect(() => {
@@ -22,12 +22,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   }, []);
 
   return (
-    <section 
-      ref={sectionRef} 
-      className="relative w-full h-screen overflow-hidden bg-black min-h-[520px]"
-    >
-      {/* Hero Image */}
-      <div className="absolute inset-0 w-full h-full">
+    <section ref={sectionRef} className="relative w-full overflow-hidden bg-black">
+      {isExtraSmall && mounted && (
+        <div className="w-full h-16 bg-white"></div>
+      )}
+      <div 
+        className="relative w-full" 
+        style={{ height: 'clamp(220px, 50vh, 400px)' }}
+      >
         <Image
           src={imageUrl}
           alt="Hero Image"
