@@ -374,10 +374,12 @@ body {
 
 /* Specifically target the copyright text for alignment */
 .copyright-text {
-  display: inline-block;
-  transform: translateY(-5px);
-  vertical-align: top;
-  margin-top: -0.25em; /* Proper baseline alignment adjustment */
+  display: flex !important;
+  align-items: center !important;
+  transform: none !important;
+  vertical-align: middle !important;
+  position: static !important;
+  top: 0 !important;
 }
 
 /* Modal styles */
