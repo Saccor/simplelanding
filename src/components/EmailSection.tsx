@@ -54,7 +54,7 @@ const EmailForm: React.FC<EmailFormProps> = ({
           width: '100%'
         }}
       >
-        Sign up with your email address, pay €1 to get our best opening offer
+        Sign up with your email address and get our best opening offer
       </p>
 
       <form 
