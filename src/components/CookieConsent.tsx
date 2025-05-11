@@ -30,6 +30,17 @@ const CookieConsentBanner: React.FC = () => {
     });
   };
 
+  // Update Google Analytics consent
+  const updateAnalyticsConsent = (options: CookieOptions) => {
+    // Only attempt to update if window.gtag exists
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
+        analytics_storage: options.analytics ? 'granted' : 'denied',
+        ad_storage: options.marketing ? 'granted' : 'denied',
+      });
+    }
+  };
+
   // Consolidated function to handle cookie preferences
   const savePreferences = (level: PreferenceLevel) => {
     let options: CookieOptions = {
@@ -63,7 +74,7 @@ const CookieConsentBanner: React.FC = () => {
     Cookies.set('cookieConsent', JSON.stringify(options), { expires: 365 });
     
     // Apply settings based on options
-    // Implementation for analytics/marketing would go here
+    updateAnalyticsConsent(options);
     
     // Update state and close settings
     setCookieOptions(options);
