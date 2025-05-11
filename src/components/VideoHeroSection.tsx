@@ -21,7 +21,6 @@ const VideoHeroSection: React.FC<VideoHeroSectionProps> = ({
   return (
     <section
       className="relative w-screen h-screen overflow-hidden"
-      style={{ aspectRatio: '16/9' }}
     >
       <video
         src={videoSrc}
@@ -31,7 +30,7 @@ const VideoHeroSection: React.FC<VideoHeroSectionProps> = ({
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-contain"
+        className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-black/20" />
       
