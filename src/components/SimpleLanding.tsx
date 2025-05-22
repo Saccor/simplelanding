@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Header from './Header';
-import HeroSection from './HeroSection';
+import VideoHeroSection from './VideoHeroSection';
 import TextSection from './TextSection';
 import EmailSection from './EmailSection';
 import Footer from './Footer';
@@ -35,8 +35,8 @@ export default function SimpleLanding({
       <Header />
       
       {/* Fullscreen Hero Section */}
-      <HeroSection
-        imageUrl={imageUrl}
+      <VideoHeroSection
+        videoUrl="/videos/Hero_v2_1.mp4"
       />
 
       {/* Content Sections */}
