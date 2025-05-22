@@ -26,7 +26,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
@@ -34,6 +38,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Setup documentation
+MAILERLITE_SETUP.md
+FORMSPREE_SETUP.md
 
 # Large media files
 public/HeroVideo\ 1.mp4
